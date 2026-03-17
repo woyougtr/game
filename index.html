@@ -6,11 +6,7 @@
     <title>MiniMax API 使用情况</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
@@ -18,10 +14,7 @@
             padding: 40px 20px;
             color: #fff;
         }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
+        .container { max-width: 900px; margin: 0 auto; }
         h1 {
             text-align: center;
             font-size: 2.5rem;
@@ -30,11 +23,8 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .subtitle {
-            text-align: center;
-            color: #888;
-            margin-bottom: 40px;
-        }
+        .subtitle { text-align: center; color: #888; margin-bottom: 40px; }
+        .loading { text-align: center; padding: 40px; color: #00d2ff; }
         .cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -47,11 +37,7 @@
             padding: 24px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .card h3 {
-            color: #00d2ff;
-            margin-bottom: 16px;
-            font-size: 1.2rem;
-        }
+        .card h3 { color: #00d2ff; margin-bottom: 16px; font-size: 1.2rem; }
         .stat {
             display: flex;
             justify-content: space-between;
@@ -59,13 +45,8 @@
             padding: 8px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
-        .stat-label {
-            color: #888;
-        }
-        .stat-value {
-            font-weight: bold;
-            color: #fff;
-        }
+        .stat-label { color: #888; }
+        .stat-value { font-weight: bold; color: #fff; }
         .progress-bar {
             height: 24px;
             background: rgba(255, 255, 255, 0.1);
@@ -73,19 +54,7 @@
             overflow: hidden;
             margin-top: 16px;
         }
-        .progress-fill {
-            height: 100%;
-            border-radius: 12px;
-            transition: width 0.5s ease;
-        }
-        .progress-fill.session {
-            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
-            width: 8%;
-        }
-        .progress-fill.week {
-            background: linear-gradient(90deg, #f093fb, #f5576c);
-            width: 4.5%;
-        }
+        .progress-fill { height: 100%; border-radius: 12px; transition: width 0.5s ease; }
         .chart-container {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 16px;
@@ -93,26 +62,8 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             margin-bottom: 20px;
         }
-        .chart-container h3 {
-            color: #00d2ff;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .time-info {
-            text-align: center;
-            margin-top: 30px;
-            color: #666;
-            font-size: 0.9rem;
-        }
-        .warning {
-            background: rgba(255, 193, 7, 0.1);
-            border: 1px solid rgba(255, 193, 7, 0.3);
-            border-radius: 8px;
-            padding: 12px;
-            margin-top: 16px;
-            color: #ffc107;
-            font-size: 0.9rem;
-        }
+        .chart-container h3 { color: #00d2ff; margin-bottom: 20px; text-align: center; }
+        .time-info { text-align: center; margin-top: 30px; color: #666; font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -120,133 +71,150 @@
         <h1>🤖 MiniMax API 使用情况</h1>
         <p class="subtitle">MiniMax-M2.5 模型</p>
         
-        <div class="cards">
+        <div class="loading" id="loading">加载中...</div>
+        
+        <div class="cards" id="cards" style="display:none;">
             <div class="card">
                 <h3>📊 本次会话</h3>
                 <div class="stat">
                     <span class="stat-label">剩余次数</span>
-                    <span class="stat-value">552 次</span>
+                    <span class="stat-value" id="sessionRemain">-</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">已用次数</span>
-                    <span class="stat-value">48 次</span>
+                    <span class="stat-value" id="sessionUsed">-</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">总次数</span>
-                    <span class="stat-value">600 次</span>
+                    <span class="stat-value" id="sessionTotal">-</span>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill session"></div>
+                    <div class="progress-fill" id="sessionBar" style="background: linear-gradient(90deg, #00d2ff, #3a7bd5);"></div>
                 </div>
-                <p style="text-align: center; margin-top: 8px; color: #00d2ff;">已用 8%</p>
+                <p style="text-align: center; margin-top: 8px; color: #00d2ff;" id="sessionPercent">-</p>
             </div>
             
             <div class="card">
                 <h3>📅 本周</h3>
                 <div class="stat">
                     <span class="stat-label">剩余次数</span>
-                    <span class="stat-value">5,728 次</span>
+                    <span class="stat-value" id="weekRemain">-</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">已用次数</span>
-                    <span class="stat-value">272 次</span>
+                    <span class="stat-value" id="weekUsed">-</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">总次数</span>
-                    <span class="stat-value">6,000 次</span>
+                    <span class="stat-value" id="weekTotal">-</span>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill week"></div>
+                    <div class="progress-fill" id="weekBar" style="background: linear-gradient(90deg, #f093fb, #f5576c);"></div>
                 </div>
-                <p style="text-align: center; margin-top: 8px; color: #f5576c;">已用 4.5%</p>
+                <p style="text-align: center; margin-top: 8px; color: #f5576c;" id="weekPercent">-</p>
             </div>
         </div>
         
-        <div class="chart-container">
+        <div class="chart-container" id="chart1" style="display:none;">
             <h3>📈 使用量可视化</h3>
             <canvas id="usageChart" height="300"></canvas>
         </div>
         
-        <div class="chart-container">
+        <div class="chart-container" id="chart2" style="display:none;">
             <h3>💰 剩余额度分布</h3>
             <canvas id="pieChart" height="250"></canvas>
         </div>
         
-        <div class="warning">
-            ⚠️ 数据更新时间: 2026-03-18 00:57 (UTC+8)
-        </div>
-        
         <p class="time-info">
-            由 AI 助手 🦞 自动生成
+            由 AI 助手 🦞 自动生成 | <span id="updateTime">-</span>
         </p>
     </div>
     
     <script>
-        // 柱状图
-        const barCtx = document.getElementById('usageChart').getContext('2d');
-        new Chart(barCtx, {
-            type: 'bar',
-            data: {
-                labels: ['本次会话', '本周'],
-                datasets: [{
-                    label: '已用 (次)',
-                    data: [48, 272],
-                    backgroundColor: ['rgba(0, 210, 255, 0.8)', 'rgba(245, 87, 108, 0.8)'],
-                    borderColor: ['#00d2ff', '#f5576c'],
-                    borderWidth: 2,
-                    borderRadius: 8
-                }, {
-                    label: '剩余 (次)',
-                    data: [552, 5728],
-                    backgroundColor: ['rgba(0, 210, 255, 0.3)', 'rgba(245, 87, 108, 0.3)'],
-                    borderColor: ['#00d2ff', '#f5576c'],
-                    borderWidth: 2,
-                    borderRadius: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        labels: { color: '#fff' }
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: { color: '#888' },
-                        grid: { color: 'rgba(255,255,255,0.1)' }
-                    },
-                    y: {
-                        ticks: { color: '#888' },
-                        grid: { color: 'rgba(255,255,255,0.1)' }
-                    }
-                }
-            }
-        });
+        const API_URL = '/api/usage';
         
-        // 饼图
-        const pieCtx = document.getElementById('pieChart').getContext('2d');
-        new Chart(pieCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['本次会话剩余', '本周剩余'],
-                datasets: [{
-                    data: [552, 5728],
-                    backgroundColor: ['#00d2ff', '#f093fb'],
-                    borderColor: ['#1a1a2e', '#1a1a2e'],
-                    borderWidth: 3
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { color: '#fff', padding: 20 }
+        async function fetchData() {
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                
+                if (data.base_resp && data.base_resp.status_code === 0) {
+                    const model = data.model_remains.find(m => m.model_name === 'MiniMax-M2.5');
+                    if (model) {
+                        const sessionUsed = model.current_interval_total_count - model.current_interval_usage_count;
+                        const sessionRemain = model.current_interval_usage_count;
+                        const weekUsed = model.current_weekly_total_count - model.current_weekly_usage_count;
+                        const weekRemain = model.current_weekly_usage_count;
+                        
+                        document.getElementById('sessionRemain').textContent = sessionRemain + ' 次';
+                        document.getElementById('sessionUsed').textContent = sessionUsed + ' 次';
+                        document.getElementById('sessionTotal').textContent = model.current_interval_total_count + ' 次';
+                        
+                        const sessionPercent = (sessionUsed / model.current_interval_total_count * 100).toFixed(1);
+                        document.getElementById('sessionBar').style.width = sessionPercent + '%';
+                        document.getElementById('sessionPercent').textContent = '已用 ' + sessionPercent + '%';
+                        
+                        document.getElementById('weekRemain').textContent = weekRemain.toLocaleString() + ' 次';
+                        document.getElementById('weekUsed').textContent = weekUsed.toLocaleString() + ' 次';
+                        document.getElementById('weekTotal').textContent = model.current_weekly_total_count.toLocaleString() + ' 次';
+                        
+                        const weekPercent = (weekUsed / model.current_weekly_total_count * 100).toFixed(1);
+                        document.getElementById('weekBar').style.width = weekPercent + '%';
+                        document.getElementById('weekPercent').textContent = '已用 ' + weekPercent + '%';
+                        
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('cards').style.display = 'grid';
+                        document.getElementById('chart1').style.display = 'block';
+                        document.getElementById('chart2').style.display = 'block';
+                        
+                        const now = new Date();
+                        document.getElementById('updateTime').textContent = now.toLocaleString('zh-CN');
+                        
+                        new Chart(document.getElementById('usageChart').getContext('2d'), {
+                            type: 'bar',
+                            data: {
+                                labels: ['本次会话', '本周'],
+                                datasets: [{
+                                    label: '已用 (次)',
+                                    data: [sessionUsed, weekUsed],
+                                    backgroundColor: ['rgba(0, 210, 255, 0.8)', 'rgba(245, 87, 108, 0.8)'],
+                                    borderRadius: 8
+                                }, {
+                                    label: '剩余 (次)',
+                                    data: [sessionRemain, weekRemain],
+                                    backgroundColor: ['rgba(0, 210, 255, 0.3)', 'rgba(245, 87, 108, 0.3)'],
+                                    borderRadius: 8
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: { legend: { labels: { color: '#fff' } } },
+                                scales: {
+                                    x: { ticks: { color: '#888' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                                    y: { ticks: { color: '#888' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                                }
+                            }
+                        });
+                        
+                        new Chart(document.getElementById('pieChart').getContext('2d'), {
+                            type: 'doughnut',
+                            data: {
+                                labels: ['本次会话剩余', '本周剩余'],
+                                datasets: [{ data: [sessionRemain, weekRemain], backgroundColor: ['#00d2ff', '#f093fb'] }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: { legend: { position: 'bottom', labels: { color: '#fff', padding: 20 } } }
+                            }
+                        });
                     }
                 }
+            } catch (e) {
+                document.getElementById('loading').textContent = '加载失败，请刷新重试';
             }
-        });
+        }
+        
+        fetchData();
     </script>
 </body>
 </html>
