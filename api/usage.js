@@ -12,6 +12,11 @@ module.exports = async function handler(req, res) {
     
     const data = await response.json();
     res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({ error: error.message });
