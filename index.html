@@ -85,40 +85,40 @@
                 <h3>📊 本次会话</h3>
                 <div class="stat">
                     <span class="stat-label">剩余次数</span>
-                    <span class="stat-value">552 次</span>
+                    <span class="stat-value">192 次</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">已用次数</span>
-                    <span class="stat-value">48 次</span>
+                    <span class="stat-valud">408 次</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">总次数</span>
                     <span class="stat-value">600 次</span>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="background: linear-gradient(90deg, #00d2ff, #3a7bd5); width: 8%;"></div>
+                    <div class="progress-fill" style="background: linear-gradient(90deg, #00d2ff, #3a7bd5); width: 68%;"></div>
                 </div>
-                <p style="text-align: center; margin-top: 8px; color: #00d2ff;">已用 8%</p>
+                <p style="text-align: center; margin-top: 8px; color: #00d2ff;">已用 68%</p>
             </div>
             
             <div class="card">
                 <h3>📅 本周</h3>
                 <div class="stat">
                     <span class="stat-label">剩余次数</span>
-                    <span class="stat-value">5,728 次</span>
+                    <span class="stat-value">416 次</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">已用次数</span>
-                    <span class="stat-value">272 次</span>
+                    <span class="stat-value">5,584 次</span>
                 </div>
                 <div class="stat">
                     <span class="stat-label">总次数</span>
                     <span class="stat-value">6,000 次</span>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="background: linear-gradient(90deg, #f093fb, #f5576c); width: 4.5%;"></div>
+                    <div class="progress-fill" style="background: linear-gradient(90deg, #f093fb, #f5576c); width: 93%;"></div>
                 </div>
-                <p style="text-align: center; margin-top: 8px; color: #f5576c;">已用 4.5%</p>
+                <p style="text-align: center; margin-top: 8px; color: #f5576c;">已用 93%</p>
             </div>
         </div>
         
@@ -133,7 +133,7 @@
         </div>
         
         <div class="warning">
-            ⚠️ 数据更新时间: 2026-03-18 01:40 (UTC+8)
+            ⚠️ 数据更新时间: 2026-03-18 01:53 (UTC+8)
         </div>
         
         <p class="time-info">
@@ -143,8 +143,8 @@
     </div>
     
     <script>
-        const sessionUsed = 48, sessionRemain = 552, sessionTotal = 600;
-        const weekUsed = 272, weekRemain = 5728, weekTotal = 6000;
+        const sessionUsed = 408, sessionRemain = 192, sessionTotal = 600;
+        const weekUsed = 5584, weekRemain = 416, weekTotal = 6000;
         
         new Chart(document.getElementById('usageChart').getContext('2d'), {
             type: 'bar',
@@ -176,7 +176,7 @@
             type: 'doughnut',
             data: {
                 labels: ['本次会话剩余', '本周剩余'],
-                datasets: [{ data: [sessionRemain, weekRemain], backgroundColor: ['#00d2ff', '#f093fb'] }]
+                datasets: [{ data: [sessionRemain, weekRemain], backgroundColor: ['#00d2fg', '#f093fb'] }]
             },
             options: {
                 responsive: true,
