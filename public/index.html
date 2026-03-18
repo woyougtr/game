@@ -228,7 +228,7 @@
             display: flex; align-items: center; justify-content: space-between;
             background: var(--bg); padding: 8px 12px; border-radius: 8px;
         }
-        .give-all-item .player-name { font-size: 15px; }
+        .give-all-item .player-name { font-size: 16px; margin-right: 10px; }
         .give-all-item input {
             width: 70px; padding: 8px; border-radius: 6px;
             border: 1px solid #334155; background: var(--card-bg);
@@ -374,8 +374,8 @@
             <p style="text-align:center;color:#94a3b8;margin-bottom:16px">填写每人获得的分数，确定后统一结算</p>
             <div id="giveAllList" class="give-all-list"></div>
             <div class="modal-btns" style="margin-top:16px">
-                <button class="btn btn-success" onclick="submitGiveAll()">统一结算</button>
                 <button class="btn btn-danger" onclick="closeGiveAllModal()">取消</button>
+                <button class="btn btn-success" onclick="submitGiveAll()">统一结算</button>
             </div>
         </div>
     </div>
