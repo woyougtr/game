@@ -48,7 +48,6 @@
             flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;
         }
         .btn-add { background: #4CAF50; color: #fff; }
-        .btn-sub { background: #f44336; color: #fff; }
         .score-input-modal {
             display: none; position: fixed; top: 0; left: 0;
             width: 100%; height: 100%; background: rgba(0,0,0,0.8);
@@ -115,7 +114,7 @@
             <div class="status">🟢 在线</div>
             <div id="playerList" class="player-list"></div>
             <div class="action-buttons">
-                <button class="btn btn-warning" onclick="showSettlement()">💰 清算</button>
+                <button class="btn btn-warning" id="settlementBtn" onclick="showSettlement()">💰 清算</button>
                 <button class="btn btn-danger" onclick="leaveRoom()">离开</button>
             </div>
         </div>
@@ -125,7 +124,7 @@
             <div id="settlementList"></div>
             <div class="action-buttons">
                 <button class="btn btn-secondary" onclick="backToGame()">返回</button>
-                <button class="btn btn-danger" onclick="resetGame()">重新开始</button>
+                <button class="btn btn-danger" id="resetBtn" onclick="resetGame()">重新开始</button>
             </div>
         </div>
     </div>
@@ -135,13 +134,13 @@
             <h3 id="scoreModalTitle">给谁记分</h3>
             <input type="number" id="scoreInput" placeholder="输入分数" inputmode="numeric">
             <div class="modal-buttons">
-                <button class="btn btn-sub" onclick="submitScore(-1)">-1</button>
-                <button class="btn btn-sub" onclick="submitScore(-5)">-5</button>
-                <button class="btn btn-add" onclick="submitScore(5)">+5</button>
-                <button class="btn btn-add" onclick="submitScore(10)">+10</button>
+                <button class="btn btn-add" style="background:#4CAF50" onclick="submitScore(1)">+1</button>
+                <button class="btn btn-add" style="background:#4CAF50" onclick="submitScore(5)">+5</button>
+                <button class="btn btn-add" style="background:#4CAF50" onclick="submitScore(10)">+10</button>
+                <button class="btn btn-add" style="background:#4CAF50" onclick="submitScore(20)">+20</button>
             </div>
             <div class="modal-buttons" style="margin-top: 10px;">
-                <button class="btn btn-secondary" style="flex:2" onclick="showCustomInput()">自定义</button>
+                <button class="btn btn-secondary" style="flex:2" onclick="submitCustomScore()">确认</button>
                 <button class="btn btn-danger" onclick="closeScoreModal()">取消</button>
             </div>
         </div>
@@ -156,6 +155,7 @@
         let players = {};
         let targetPlayer = '';
         let pollInterval = null;
+        let isHost = false;
 
         // 轮询获取房间状态
         async function pollRoom() {
@@ -172,6 +172,14 @@
                     // 检测玩家加入/离开
                     const newPlayers = Object.keys(players);
                     const oldKeys = Object.keys(JSON.parse(oldPlayers));
+                    
+                    // 第一个加入的是房主
+                    const playerNames = Object.keys(players);
+                    isHost = playerNames.length > 0 && playerNames[0] === currentPlayer;
+                    
+                    // 更新按钮权限
+                    document.getElementById('settlementBtn').textContent = isHost ? '💰 清算(房主)' : '💰 查看清算';
+                    document.getElementById('resetBtn').style.display = isHost ? 'block' : 'none';
                     
                     newPlayers.forEach(p => {
                         if (!oldKeys.includes(p) && p !== currentPlayer) {
@@ -266,7 +274,7 @@
                         </div>
                         ${!isMe ? `
                         <div class="player-actions">
-                            <button class="btn-add" onclick="openScoreModal('${name}')">记分</button>
+                            <button class="btn-add" onclick="openScoreModal('${name}')">给分</button>
                         </div>
                         ` : ''}
                     </div>
@@ -277,7 +285,7 @@
         // 打开记分弹窗
         function openScoreModal(playerName) {
             targetPlayer = playerName;
-            document.getElementById('scoreModalTitle').textContent = `给 ${playerName} 记分`;
+            document.getElementById('scoreModalTitle').textContent = `给 ${playerName} 多少分`;
             document.getElementById('scoreInput').value = '';
             document.getElementById('scoreModal').classList.add('active');
         }
@@ -287,19 +295,27 @@
             document.getElementById('scoreModal').classList.remove('active');
         }
 
-        // 提交分数 - 你给别多少，自己扣多少
-        async function submitScore(score) {
+        // 提交自定义分数
+        async function submitCustomScore() {
             const input = document.getElementById('scoreInput').value;
-            if (input) {
-                score = parseInt(input);
-                if (isNaN(score) || score === 0) {
-                    showToast('请输入有效分数');
-                    return;
-                }
+            if (!input) {
+                showToast('请输入分数');
+                return;
             }
             
+            const score = parseInt(input);
+            if (isNaN(score) || score <= 0) {
+                showToast('请输入正分数');
+                return;
+            }
+            
+            await submitScore(score);
+        }
+
+        // 提交分数 - 你给多少，自己扣多少
+        async function submitScore(score) {
             try {
-                // 给目标玩家加分数，自己扣分数
+                // 给目标玩家加分数
                 await fetch(`${API_BASE}/api/score`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -330,13 +346,15 @@
             }
         }
 
-        // 显示自定义输入
-        function showCustomInput() {
-            document.getElementById('scoreInput').focus();
-        }
-
         // 清算
         async function showSettlement() {
+            if (!isHost) {
+                // 非房主只能查看，不能触发重新开始
+                document.getElementById('resetBtn').style.display = 'none';
+            } else {
+                document.getElementById('resetBtn').style.display = 'block';
+            }
+            
             try {
                 const res = await fetch(`${API_BASE}/api/settlement/${currentRoom}`);
                 const data = await res.json();
@@ -380,6 +398,11 @@
 
         // 重新开始
         async function resetGame() {
+            if (!isHost) {
+                showToast('只有房主可以重新开始');
+                return;
+            }
+            
             try {
                 await fetch(`${API_BASE}/api/reset`, {
                     method: 'POST',
