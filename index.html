@@ -403,7 +403,6 @@
                     isHost = playerNames.length > 0 && playerNames[0] === currentPlayer;
                     
                     document.getElementById('hostTag').style.display = isHost ? 'inline' : 'none';
-                    document.getElementById('settlementBtn').textContent = isHost ? '💰 清算(房主)' : '💰 查看清算';
                     
                     renderPlayers();
                     renderHistory();
