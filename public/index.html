@@ -81,7 +81,7 @@
         
         .room-header {
             background: linear-gradient(135deg, #334155, #1e293b);
-            padding: 20px; border-radius: 16px; margin-bottom: 20px;
+            padding: 16px; border-radius: 16px; margin-bottom: 20px;
             text-align: center;
             border: 1px solid #475569;
         }
@@ -95,6 +95,13 @@
             background: linear-gradient(135deg, #f59e0b, #ef4444);
             padding: 4px 10px; border-radius: 12px; font-size: 12px; margin-left: 8px;
         }
+        .btn-icon {
+            background: #334155; border: none; padding: 8px 14px; border-radius: 8px;
+            color: var(--text); cursor: pointer; font-size: 14px;
+        }
+        .btn-icon:hover { background: #475569; }
+        .btn-danger-icon { color: #f87171; }
+        .btn-danger-icon:hover { background: #7f1d1d; }
         
         .section-title {
             font-size: 14px; color: var(--text-secondary); margin: 20px 0 12px;
@@ -301,7 +308,11 @@
         <!-- 游戏页面 -->
         <div id="gameScreen" class="screen">
             <div class="room-header">
-                <div class="room-code">房间号 <strong id="displayRoomCode"></strong> <button onclick="copyRoomCode()" style="background:none;border:none;color:#a78bfa;cursor:pointer;font-size:16px">📋</button></div>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <button class="btn-icon" onclick="showSettlement()">💰 清算</button>
+                    <div class="room-code">房间号 <strong id="displayRoomCode"></strong> <button onclick="copyRoomCode()" style="background:none;border:none;color:#a78bfa;cursor:pointer;font-size:16px">📋</button></div>
+                    <button class="btn-icon btn-danger-icon" onclick="leaveRoom()">✕ 离开</button>
+                </div>
                 <div class="player-badge">
                     <span id="displayPlayerName"></span>
                     <span id="hostTag" class="host-badge" style="display:none">房主</span>
@@ -321,11 +332,11 @@
                 <div id="historyList" class="history-list"></div>
             </div>
             
+            </div>
+            
             <div class="action-bar">
                 <div class="action-bar-inner">
                     <button class="btn btn-secondary" onclick="openGiveAllModal()">一键给分</button>
-                    <button class="btn btn-secondary" id="settlementBtn" onclick="showSettlement()">💰 清算</button>
-                    <button class="btn btn-danger" onclick="leaveRoom()">离开</button>
                 </div>
             </div>
         </div>
