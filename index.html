@@ -310,14 +310,13 @@
         <!-- 游戏页面 -->
         <div id="gameScreen" class="screen">
             <div class="room-header">
+                <div class="room-code" style="justify-content:center;margin-bottom:8px">房间号 <strong id="displayRoomCode"></strong> <button onclick="copyRoomCode()" class="share-btn">复制</button> <button onclick="showShareQR()" class="share-btn" style="background:linear-gradient(135deg,#a78bfa,#f472b6)">分享</button></div>
                 <div style="display:flex;justify-content:space-between;align-items:center">
-                    <button class="btn-icon" onclick="showSettlement()">💰 清算</button>
-                    <div class="room-code">房间号 <strong id="displayRoomCode"></strong> <button onclick="copyRoomCode()" class="share-btn">复制房间号</button> <button onclick="showShareQR()" class="share-btn" style="background:linear-gradient(135deg,#a78bfa,#f472b6)">分享房间</button></div>
-                    <button class="btn-icon btn-danger-icon" onclick="leaveRoom()">✕ 离开</button>
-                </div>
-                <div class="player-badge">
-                    <span id="displayPlayerName"></span>
-                    <span id="hostTag" class="host-badge" style="display:none">房主</span>
+                    <div class="player-badge">
+                        <span id="displayPlayerName"></span>
+                        <span id="hostTag" class="host-badge" style="display:none">房主</span>
+                    </div>
+                    <button class="btn-icon btn-danger-icon" onclick="leaveRoom()">离开</button>
                 </div>
             </div>
             
@@ -336,6 +335,7 @@
             
             <div class="action-bar">
                 <div class="action-bar-inner">
+                    <button class="btn btn-secondary" onclick="showSettlement()">💰 清算</button>
                     <button class="btn btn-secondary" onclick="openGiveAllModal()">一键给分</button>
                 </div>
             </div>
