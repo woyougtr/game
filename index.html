@@ -387,8 +387,19 @@
 
     <script>
         const API_BASE = window.location.origin;
-        let currentRoom = '', currentPlayer = '', players = {}, history = [];
+        let currentRoom = localStorage.getItem('roomCode') || '';
+        let currentPlayer = localStorage.getItem('playerName') || '';
+        let players = {}, history = {};
         let pollInterval = null, isHost = false;
+
+        // 页面加载时自动重新加入
+        if (currentRoom && currentPlayer) {
+            setTimeout(() => {
+                document.getElementById('roomCode').value = currentRoom;
+                document.getElementById('playerName').value = currentPlayer;
+                joinRoom(true);
+            }, 100);
+        }
 
         async function pollRoom() {
             if (!currentRoom) return;
@@ -420,7 +431,7 @@
             if (pollInterval) clearInterval(pollInterval);
         }
 
-        async function joinRoom() {
+        async function joinRoom(isAuto = false) {
             const roomCode = document.getElementById('roomCode').value.trim();
             const playerName = document.getElementById('playerName').value.trim();
             if (!roomCode || !playerName) return showToast('请输入房间号和名字');
@@ -437,6 +448,10 @@
                 currentPlayer = playerName;
                 players = data.players || {};
                 history = data.history || [];
+                
+                // 保存到 localStorage
+                localStorage.setItem('roomCode', roomCode);
+                localStorage.setItem('playerName', playerName);
                 
                 showScreen('gameScreen');
                 document.getElementById('displayRoomCode').textContent = roomCode;
@@ -631,6 +646,8 @@
         function leaveRoom() {
             stopPolling();
             currentRoom = ''; currentPlayer = ''; players = {}; history = [];
+            localStorage.removeItem('roomCode');
+            localStorage.removeItem('playerName');
             showScreen('joinScreen');
         }
 
