@@ -5,242 +5,98 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>游戏记分 - 实时同步</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: #fff;
         }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #ffd700;
-        }
-        .screen {
-            display: none;
-        }
-        .screen.active {
-            display: block;
-        }
-        /* 加入房间 */
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        h1 { text-align: center; margin-bottom: 30px; color: #ffd700; }
+        .screen { display: none; }
+        .screen.active { display: block; }
         .join-screen input {
-            width: 100%;
-            padding: 15px;
-            font-size: 18px;
-            border: none;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            background: rgba(255,255,255,0.1);
-            color: #fff;
+            width: 100%; padding: 15px; font-size: 18px;
+            border: none; border-radius: 10px; margin-bottom: 15px;
+            background: rgba(255,255,255,0.1); color: #fff;
         }
-        .join-screen input::placeholder {
-            color: rgba(255,255,255,0.5);
-        }
+        .join-screen input::placeholder { color: rgba(255,255,255,0.5); }
         .btn {
-            width: 100%;
-            padding: 15px;
-            font-size: 18px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            background: #4CAF50;
-            color: #fff;
-            margin-bottom: 10px;
+            width: 100%; padding: 15px; font-size: 18px;
+            border: none; border-radius: 10px; cursor: pointer;
+            background: #4CAF50; color: #fff; margin-bottom: 10px;
         }
-        .btn:active {
-            transform: scale(0.98);
-        }
-        .btn-secondary {
-            background: #2196F3;
-        }
-        .btn-danger {
-            background: #f44336;
-        }
-        .btn-warning {
-            background: #ff9800;
-        }
-        /* 游戏画面 */
+        .btn:active { transform: scale(0.98); }
+        .btn-secondary { background: #2196F3; }
+        .btn-danger { background: #f44336; }
+        .btn-warning { background: #ff9800; }
         .room-info {
-            background: rgba(255,255,255,0.1);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
+            background: rgba(255,255,255,0.1); padding: 15px;
+            border-radius: 10px; margin-bottom: 20px; text-align: center;
         }
-        .player-list {
-            display: grid;
-            gap: 15px;
-        }
+        .player-list { display: grid; gap: 15px; }
         .player-card {
-            background: rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: rgba(255,255,255,0.1); padding: 20px;
+            border-radius: 15px; display: flex; justify-content: space-between; align-items: center;
         }
-        .player-name {
-            font-size: 20px;
-            font-weight: bold;
-        }
-        .player-score {
-            font-size: 32px;
-            font-weight: bold;
-            color: #ffd700;
-        }
-        .player-score.negative {
-            color: #f44336;
-        }
-        .player-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
+        .player-name { font-size: 20px; font-weight: bold; }
+        .player-score { font-size: 32px; font-weight: bold; color: #ffd700; }
+        .player-score.negative { color: #f44336; }
+        .player-actions { display: flex; gap: 10px; margin-top: 10px; }
         .player-actions button {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
+            flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;
         }
-        .btn-add {
-            background: #4CAF50;
-            color: #fff;
-        }
-        .btn-sub {
-            background: #f44336;
-            color: #fff;
-        }
+        .btn-add { background: #4CAF50; color: #fff; }
+        .btn-sub { background: #f44336; color: #fff; }
         .score-input-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.8);
+            justify-content: center; align-items: center; z-index: 1000;
         }
-        .score-input-modal.active {
-            display: flex;
-        }
+        .score-input-modal.active { display: flex; }
         .modal-content {
-            background: #1a1a2e;
-            padding: 30px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 400px;
+            background: #1a1a2e; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px;
         }
-        .modal-content h3 {
-            margin-bottom: 20px;
-            text-align: center;
-        }
+        .modal-content h3 { margin-bottom: 20px; text-align: center; }
         .modal-content input {
-            width: 100%;
-            padding: 15px;
-            font-size: 24px;
-            border: none;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            text-align: center;
+            width: 100%; padding: 15px; font-size: 24px;
+            border: none; border-radius: 10px; margin-bottom: 15px;
+            background: rgba(255,255,255,0.1); color: #fff; text-align: center;
         }
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-        }
+        .modal-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
         .modal-buttons button {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 18px;
+            flex: 1; min-width: 70px; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-size: 18px;
         }
-        /* 清算画面 */
         .settlement {
-            background: rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 15px;
+            background: rgba(255,255,255,0.1); padding: 20px;
+            border-radius: 15px; margin-bottom: 15px;
         }
         .settlement-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
+            display: flex; justify-content: space-between; padding: 10px 0;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        .settlement-item:last-child {
-            border-bottom: none;
-        }
-        .settlement-from {
-            color: #f44336;
-        }
-        .settlement-to {
-            color: #4CAF50;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
+        .settlement-item:last-child { border-bottom: none; }
+        .settlement-from { color: #f44336; }
+        .settlement-to { color: #4CAF50; }
+        .action-buttons { display: flex; gap: 10px; margin-top: 20px; }
         .action-buttons button {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        /* 创建房间 */
-        .create-room {
-            text-align: center;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        .create-room a {
-            color: #2196F3;
-            text-decoration: none;
+            flex: 1; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-size: 16px;
         }
         .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #4CAF50;
-            padding: 15px 30px;
-            border-radius: 10px;
-            display: none;
-            z-index: 2000;
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: #4CAF50; padding: 15px 30px; border-radius: 10px; display: none; z-index: 2000;
         }
-        .toast.show {
-            display: block;
-            animation: fadeIn 0.3s;
-        }
+        .toast.show { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
+        .status { text-align: center; padding: 10px; font-size: 14px; color: #888; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 加入房间画面 -->
         <div id="joinScreen" class="screen active">
             <h1>🎮 游戏记分</h1>
             <div class="join-screen">
@@ -251,12 +107,12 @@
             </div>
         </div>
 
-        <!-- 游戏画面 -->
         <div id="gameScreen" class="screen">
             <div class="room-info">
                 <div>房间号: <strong id="displayRoomCode"></strong></div>
                 <div>玩家: <strong id="displayPlayerName"></strong></div>
             </div>
+            <div class="status">🟢 在线</div>
             <div id="playerList" class="player-list"></div>
             <div class="action-buttons">
                 <button class="btn btn-warning" onclick="showSettlement()">💰 清算</button>
@@ -264,7 +120,6 @@
             </div>
         </div>
 
-        <!-- 清算画面 -->
         <div id="settlementScreen" class="screen">
             <h1>💰 清算方案</h1>
             <div id="settlementList"></div>
@@ -275,7 +130,6 @@
         </div>
     </div>
 
-    <!-- 记分弹窗 -->
     <div id="scoreModal" class="score-input-modal">
         <div class="modal-content">
             <h3 id="scoreModalTitle">给谁记分</h3>
@@ -287,7 +141,7 @@
                 <button class="btn btn-add" onclick="submitScore(10)">+10</button>
             </div>
             <div class="modal-buttons" style="margin-top: 10px;">
-                <button class="btn btn-secondary" onclick="showCustomInput()">自定义</button>
+                <button class="btn btn-secondary" style="flex:2" onclick="showCustomInput()">自定义</button>
                 <button class="btn btn-danger" onclick="closeScoreModal()">取消</button>
             </div>
         </div>
@@ -296,66 +150,63 @@
     <div id="toast" class="toast"></div>
 
     <script>
-        let ws = null;
+        const API_BASE = window.location.origin;
         let currentRoom = '';
         let currentPlayer = '';
         let players = {};
         let targetPlayer = '';
+        let pollInterval = null;
 
-        // WebSocket 连接
-        function connectWS() {
-            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            ws = new WebSocket(`${protocol}//${window.location.host}`);
-
-            ws.onopen = () => {
-                console.log('Connected to server');
-            };
-
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                handleMessage(data);
-            };
-
-            ws.onclose = () => {
-                showToast('连接断开，正在重连...');
-                setTimeout(connectWS, 3000);
-            };
+        // 轮询获取房间状态
+        async function pollRoom() {
+            if (!currentRoom || !currentPlayer) return;
+            
+            try {
+                const res = await fetch(`${API_BASE}/api/room/${currentRoom}`);
+                const data = await res.json();
+                
+                if (data.players) {
+                    const oldPlayers = JSON.stringify(players);
+                    players = data.players;
+                    
+                    // 检测玩家加入/离开
+                    const newPlayers = Object.keys(players);
+                    const oldKeys = Object.keys(JSON.parse(oldPlayers));
+                    
+                    newPlayers.forEach(p => {
+                        if (!oldKeys.includes(p) && p !== currentPlayer) {
+                            showToast(`${p} 加入了房间`);
+                        }
+                    });
+                    oldKeys.forEach(p => {
+                        if (!newPlayers.includes(p) && p !== currentPlayer) {
+                            showToast(`${p} 离开了房间`);
+                        }
+                    });
+                    
+                    renderPlayers();
+                }
+            } catch (e) {
+                console.error('Poll error:', e);
+            }
         }
 
-        // 处理消息
-        function handleMessage(data) {
-            switch (data.type) {
-                case 'roomPlayers':
-                    players = data.players;
-                    renderPlayers();
-                    break;
-                case 'playerJoined':
-                    showToast(`${data.name} 加入了房间`);
-                    break;
-                case 'playerLeft':
-                    showToast(`${data.name} 离开了房间`);
-                    break;
-                case 'scoreUpdated':
-                    players = data.players;
-                    renderPlayers();
-                    break;
-                case 'settlement':
-                    showSettlementResult(data.settlement);
-                    break;
-                case 'gameReset':
-                    players = data.players;
-                    showToast('游戏已重新开始');
-                    backToGame();
-                    renderPlayers();
-                    break;
-                case 'error':
-                    showToast(data.message);
-                    break;
+        // 开始轮询
+        function startPolling() {
+            pollRoom();
+            pollInterval = setInterval(pollRoom, 2000);
+        }
+
+        // 停止轮询
+        function stopPolling() {
+            if (pollInterval) {
+                clearInterval(pollInterval);
+                pollInterval = null;
             }
         }
 
         // 加入房间
-        function joinRoom() {
+        async function joinRoom() {
             const roomCode = document.getElementById('roomCode').value.trim();
             const playerName = document.getElementById('playerName').value.trim();
             
@@ -364,21 +215,34 @@
                 return;
             }
 
-            currentRoom = roomCode;
-            currentPlayer = playerName;
+            try {
+                const res = await fetch(`${API_BASE}/api/join`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomCode, playerName })
+                });
+                const data = await res.json();
+                
+                if (data.error) {
+                    showToast(data.error);
+                    return;
+                }
 
-            ws.send(JSON.stringify({
-                type: 'join',
-                roomCode,
-                playerName
-            }));
+                currentRoom = roomCode;
+                currentPlayer = playerName;
+                players = data.players || {};
 
-            showScreen('gameScreen');
-            document.getElementById('displayRoomCode').textContent = roomCode;
-            document.getElementById('displayPlayerName').textContent = playerName;
+                showScreen('gameScreen');
+                document.getElementById('displayRoomCode').textContent = roomCode;
+                document.getElementById('displayPlayerName').textContent = playerName;
+                
+                startPolling();
+            } catch (e) {
+                showToast('连接失败，请检查网络');
+            }
         }
 
-        // 显示创建房间
+        // 创建新房
         function showCreateRoom() {
             const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
             document.getElementById('roomCode').value = roomCode;
@@ -424,26 +288,32 @@
         }
 
         // 提交分数
-        function submitScore(score) {
+        async function submitScore(score) {
             const input = document.getElementById('scoreInput').value;
             if (input) {
-                score = parseInt(input) * Math.sign(score);
+                score = parseInt(input);
+                if (isNaN(score) || score === 0) {
+                    showToast('请输入有效分数');
+                    return;
+                }
             }
             
-            if (score === 0) {
-                showToast('分数不能为0');
-                return;
+            try {
+                await fetch(`${API_BASE}/api/score`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        roomCode: currentRoom,
+                        playerName: currentPlayer,
+                        targetPlayer: targetPlayer,
+                        score: score
+                    })
+                });
+                closeScoreModal();
+                pollRoom(); // 立即刷新
+            } catch (e) {
+                showToast('记分失败');
             }
-
-            ws.send(JSON.stringify({
-                type: 'updateScore',
-                roomCode: currentRoom,
-                playerName: currentPlayer,
-                targetPlayer: targetPlayer,
-                score: score
-            }));
-
-            closeScoreModal();
         }
 
         // 显示自定义输入
@@ -452,11 +322,14 @@
         }
 
         // 清算
-        function showSettlement() {
-            ws.send(JSON.stringify({
-                type: 'settlement',
-                roomCode: currentRoom
-            }));
+        async function showSettlement() {
+            try {
+                const res = await fetch(`${API_BASE}/api/settlement/${currentRoom}`);
+                const data = await res.json();
+                showSettlementResult(data.settlement || []);
+            } catch (e) {
+                showToast('清算失败');
+            }
         }
 
         // 显示清算结果
@@ -464,7 +337,7 @@
             const list = document.getElementById('settlementList');
             list.innerHTML = '';
             
-            if (settlement.length === 0) {
+            if (!settlement || settlement.length === 0) {
                 list.innerHTML = '<div class="settlement">已结清，无需清算</div>';
             } else {
                 settlement.forEach(item => {
@@ -492,20 +365,24 @@
         }
 
         // 重新开始
-        function resetGame() {
-            ws.send(JSON.stringify({
-                type: 'resetGame',
-                roomCode: currentRoom
-            }));
+        async function resetGame() {
+            try {
+                await fetch(`${API_BASE}/api/reset`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomCode: currentRoom })
+                });
+                showToast('游戏已重新开始');
+                backToGame();
+                pollRoom();
+            } catch (e) {
+                showToast('重置失败');
+            }
         }
 
         // 离开房间
-        function leaveRoom() {
-            ws.send(JSON.stringify({
-                type: 'leave',
-                roomCode: currentRoom,
-                playerName: currentPlayer
-            }));
+        async function leaveRoom() {
+            stopPolling();
             currentRoom = '';
             currentPlayer = '';
             players = {};
@@ -525,9 +402,6 @@
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
-
-        // 初始化
-        connectWS();
     </script>
 </body>
 </html>
