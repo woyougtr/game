@@ -3,144 +3,312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>游戏记分 - 实时同步</title>
+    <title>游戏记分</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-secondary: #94a3b8;
+        }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #fff;
+            background: var(--bg);
+            background-image: 
+                radial-gradient(ellipse at top, #1e1b4b 0%, transparent 50%),
+                radial-gradient(ellipse at bottom right, #312e81 0%, transparent 50%);
+            color: var(--text);
+            padding-bottom: 100px;
         }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        h1 { text-align: center; margin-bottom: 30px; color: #ffd700; }
+        .container { max-width: 500px; margin: 0 auto; padding: 20px; }
+        
+        h1 { 
+            text-align: center; 
+            margin-bottom: 24px; 
+            font-size: 28px;
+            background: linear-gradient(135deg, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
         .screen { display: none; }
-        .screen.active { display: block; }
+        .screen.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
         .join-screen input {
-            width: 100%; padding: 15px; font-size: 18px;
-            border: none; border-radius: 10px; margin-bottom: 15px;
-            background: rgba(255,255,255,0.1); color: #fff;
+            width: 100%; padding: 16px 20px; font-size: 16px;
+            border: 2px solid #334155; border-radius: 14px; margin-bottom: 14px;
+            background: var(--card-bg); color: var(--text);
+            transition: border-color 0.2s;
         }
-        .join-screen input::placeholder { color: rgba(255,255,255,0.5); }
+        .join-screen input:focus { outline: none; border-color: var(--primary); }
+        .join-screen input::placeholder { color: var(--text-secondary); }
+        
         .btn {
-            width: 100%; padding: 15px; font-size: 18px;
-            border: none; border-radius: 10px; cursor: pointer;
-            background: #4CAF50; color: #fff; margin-bottom: 10px;
+            width: 100%; padding: 16px; font-size: 16px; font-weight: 600;
+            border: none; border-radius: 14px; cursor: pointer;
+            background: var(--primary); color: #fff; margin-bottom: 12px;
+            transition: transform 0.1s, background 0.2s;
         }
         .btn:active { transform: scale(0.98); }
-        .btn-secondary { background: #2196F3; }
-        .btn-danger { background: #f44336; }
-        .btn-warning { background: #ff9800; }
-        .room-info {
-            background: rgba(255,255,255,0.1); padding: 15px;
-            border-radius: 10px; margin-bottom: 20px; text-align: center;
+        .btn:hover { background: var(--primary-dark); }
+        .btn-secondary { background: #334155; }
+        .btn-secondary:hover { background: #475569; }
+        .btn-danger { background: var(--danger); }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-success { background: var(--success); }
+        .btn-success:hover { background: #16a34a; }
+        
+        .room-header {
+            background: linear-gradient(135deg, #334155, #1e293b);
+            padding: 20px; border-radius: 16px; margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid #475569;
         }
-        .player-list { display: grid; gap: 15px; }
+        .room-code { font-size: 14px; color: var(--text-secondary); }
+        .room-code strong { color: #a78bfa; font-size: 18px; letter-spacing: 2px; }
+        .player-badge {
+            display: inline-block; margin-top: 8px; padding: 6px 14px;
+            background: var(--primary); border-radius: 20px; font-size: 14px;
+        }
+        .host-badge {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            padding: 4px 10px; border-radius: 12px; font-size: 12px; margin-left: 8px;
+        }
+        
+        .section-title {
+            font-size: 14px; color: var(--text-secondary); margin: 20px 0 12px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .section-title::after {
+            content: ''; flex: 1; height: 1px; background: #334155;
+        }
+        
+        .player-list { display: flex; flex-direction: column; gap: 12px; }
         .player-card {
-            background: rgba(255,255,255,0.1); padding: 20px;
-            border-radius: 15px; display: flex; justify-content: space-between; align-items: center;
+            background: var(--card-bg); padding: 16px 20px;
+            border-radius: 14px; display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid #334155;
+            transition: transform 0.2s, border-color 0.2s;
         }
-        .player-name { font-size: 20px; font-weight: bold; }
-        .player-score { font-size: 32px; font-weight: bold; color: #ffd700; }
-        .player-score.negative { color: #f44336; }
-        .player-actions { display: flex; gap: 10px; margin-top: 10px; }
-        .player-actions button {
-            flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;
+        .player-card:hover { border-color: #475569; }
+        
+        .player-info { display: flex; align-items: center; gap: 10px; }
+        .player-avatar {
+            width: 44px; height: 44px; border-radius: 12px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: bold;
         }
-        .btn-add { background: #4CAF50; color: #fff; }
-        .score-input-modal {
+        .player-name { font-size: 17px; font-weight: 600; }
+        .player-name small { color: var(--text-secondary); font-weight: normal; }
+        
+        .player-score {
+            font-size: 28px; font-weight: bold;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .player-score.negative {
+            background: linear-gradient(135deg, #f87171, #ef4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .btn-give {
+            padding: 10px 20px; border: none; border-radius: 10px;
+            background: linear-gradient(135deg, var(--success), #10b981);
+            color: #fff; font-weight: 600; cursor: pointer; transition: transform 0.1s;
+        }
+        .btn-give:active { transform: scale(0.95); }
+        
+        .history-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; }
+        .history-item {
+            background: var(--card-bg); padding: 12px 16px;
+            border-radius: 10px; display: flex; align-items: center; gap: 12px;
+            border: 1px solid #334155;
+        }
+        .history-arrow {
+            color: var(--success); font-size: 20px;
+        }
+        .history-from { color: #f87171; font-weight: 600; }
+        .history-to { color: var(--success); font-weight: 600; }
+        .history-score { 
+            margin-left: auto; background: #334155; padding: 4px 12px;
+            border-radius: 8px; font-weight: 600; color: #fbbf24;
+        }
+        .history-empty {
+            text-align: center; padding: 40px; color: var(--text-secondary);
+        }
+        
+        .settlement-list { display: flex; flex-direction: column; gap: 12px; }
+        .settlement-item {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            padding: 20px; border-radius: 14px;
+            border: 2px solid #475569;
+        }
+        .settlement-flow {
+            display: flex; align-items: center; justify-content: center; gap: 16px;
+            font-size: 18px; margin-bottom: 12px;
+        }
+        .settlement-from { color: #f87171; font-weight: bold; font-size: 20px; }
+        .settlement-arrow { color: var(--text-secondary); font-size: 24px; }
+        .settlement-to { color: var(--success); font-weight: bold; font-size: 20px; }
+        .settlement-amount {
+            text-align: center; font-size: 32px; font-weight: bold;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .settlement-empty {
+            text-align: center; padding: 40px; color: var(--text-secondary);
+            font-size: 18px;
+        }
+        
+        .action-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(to top, var(--bg) 60%, transparent);
+            padding: 20px;
+        }
+        .action-bar-inner {
+            max-width: 500px; margin: 0 auto;
+            display: flex; gap: 12px;
+        }
+        .action-bar .btn { margin: 0; }
+        
+        .modal-overlay {
             display: none; position: fixed; top: 0; left: 0;
             width: 100%; height: 100%; background: rgba(0,0,0,0.8);
             justify-content: center; align-items: center; z-index: 1000;
+            padding: 20px;
         }
-        .score-input-modal.active { display: flex; }
-        .modal-content {
-            background: #1a1a2e; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px;
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--card-bg); padding: 28px; border-radius: 20px;
+            width: 100%; max-width: 360px; border: 1px solid #475569;
+            animation: modalIn 0.2s;
         }
-        .modal-content h3 { margin-bottom: 20px; text-align: center; }
-        .modal-content input {
-            width: 100%; padding: 15px; font-size: 24px;
-            border: none; border-radius: 10px; margin-bottom: 15px;
-            background: rgba(255,255,255,0.1); color: #fff; text-align: center;
+        @keyframes modalIn { from { transform: scale(0.9); opacity: 0; } }
+        .modal h3 { text-align: center; margin-bottom: 20px; font-size: 20px; }
+        .modal input {
+            width: 100%; padding: 16px; font-size: 24px;
+            border: 2px solid #334155; border-radius: 12px; margin-bottom: 16px;
+            background: var(--bg); color: var(--text); text-align: center;
         }
-        .modal-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
-        .modal-buttons button {
-            flex: 1; min-width: 70px; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-size: 18px;
+        .modal input:focus { outline: none; border-color: var(--primary); }
+        .quick-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+        .quick-btn {
+            padding: 14px; border: none; border-radius: 10px;
+            background: linear-gradient(135deg, var(--success), #10b981);
+            color: #fff; font-size: 16px; font-weight: 600; cursor: pointer;
         }
-        .settlement {
-            background: rgba(255,255,255,0.1); padding: 20px;
-            border-radius: 15px; margin-bottom: 15px;
-        }
-        .settlement-item {
-            display: flex; justify-content: space-between; padding: 10px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .settlement-item:last-child { border-bottom: none; }
-        .settlement-from { color: #f44336; }
-        .settlement-to { color: #4CAF50; }
-        .action-buttons { display: flex; gap: 10px; margin-top: 20px; }
-        .action-buttons button {
-            flex: 1; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-size: 16px;
-        }
+        .quick-btn:active { transform: scale(0.95); }
+        .modal-btns { display: flex; gap: 10px; }
+        .modal-btns .btn { padding: 14px; }
+        
         .toast {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: #4CAF50; padding: 15px 30px; border-radius: 10px; display: none; z-index: 2000;
+            background: var(--success); padding: 14px 28px; border-radius: 12px;
+            display: none; z-index: 2000; font-weight: 600; box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
-        .toast.show { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast.show { display: block; animation: toastIn 0.3s; }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
+        
+        .tab-bar {
+            display: flex; background: var(--card-bg); border-radius: 12px; padding: 4px;
+            margin-bottom: 16px;
         }
-        .status { text-align: center; padding: 10px; font-size: 14px; color: #888; }
+        .tab {
+            flex: 1; padding: 12px; text-align: center; border-radius: 10px;
+            color: var(--text-secondary); font-weight: 600; cursor: pointer; transition: 0.2s;
+        }
+        .tab.active { background: var(--primary); color: #fff; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body>
     <div class="container">
+        <h1>🎮 游戏记分</h1>
+        
+        <!-- 加入页面 -->
         <div id="joinScreen" class="screen active">
-            <h1>🎮 游戏记分</h1>
             <div class="join-screen">
-                <input type="text" id="roomCode" placeholder="输入房间号" maxlength="6">
+                <input type="text" id="roomCode" placeholder="房间号" maxlength="6">
                 <input type="text" id="playerName" placeholder="你的名字" maxlength="10">
                 <button class="btn" onclick="joinRoom()">加入房间</button>
-                <button class="btn btn-secondary" onclick="showCreateRoom()">创建新房</button>
+                <button class="btn btn-secondary" onclick="createRoom()">创建新房</button>
             </div>
         </div>
 
+        <!-- 游戏页面 -->
         <div id="gameScreen" class="screen">
-            <div class="room-info">
-                <div>房间号: <strong id="displayRoomCode"></strong></div>
-                <div>玩家: <strong id="displayPlayerName"></strong></div>
+            <div class="room-header">
+                <div class="room-code">房间号 <strong id="displayRoomCode"></strong></div>
+                <div class="player-badge">
+                    <span id="displayPlayerName"></span>
+                    <span id="hostTag" class="host-badge" style="display:none">房主</span>
+                </div>
             </div>
-            <div class="status">🟢 在线</div>
-            <div id="playerList" class="player-list"></div>
-            <div class="action-buttons">
-                <button class="btn btn-warning" id="settlementBtn" onclick="showSettlement()">💰 清算</button>
-                <button class="btn btn-danger" onclick="leaveRoom()">离开</button>
+            
+            <div class="tab-bar">
+                <div class="tab active" onclick="switchTab('players')">玩家</div>
+                <div class="tab" onclick="switchTab('history')">记录</div>
+            </div>
+            
+            <div id="tab-players" class="tab-content active">
+                <div id="playerList" class="player-list"></div>
+            </div>
+            
+            <div id="tab-history" class="tab-content">
+                <div id="historyList" class="history-list"></div>
+            </div>
+            
+            <div class="action-bar">
+                <div class="action-bar-inner">
+                    <button class="btn btn-secondary" id="settlementBtn" onclick="showSettlement()">💰 清算</button>
+                    <button class="btn btn-danger" onclick="leaveRoom()">离开</button>
+                </div>
             </div>
         </div>
 
+        <!-- 清算页面 -->
         <div id="settlementScreen" class="screen">
             <h1>💰 清算方案</h1>
             <div id="settlementList"></div>
-            <div class="action-buttons">
-                <button class="btn btn-secondary" onclick="backToGame()">返回</button>
-                <button class="btn btn-danger" id="resetBtn" onclick="resetGame()">重新开始</button>
+            <div class="action-bar">
+                <div class="action-bar-inner">
+                    <button class="btn btn-secondary" onclick="backToGame()">返回</button>
+                    <button class="btn btn-danger" id="resetBtn" onclick="resetGame()">重新开始</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="scoreModal" class="score-input-modal">
-        <div class="modal-content">
-            <h3 id="scoreModalTitle">给谁记分</h3>
+    <!-- 记分弹窗 -->
+    <div id="scoreModal" class="modal-overlay">
+        <div class="modal">
+            <h3 id="scoreModalTitle">给 分</h3>
             <input type="number" id="scoreInput" placeholder="输入分数" inputmode="numeric">
-            <div class="modal-buttons">
-                <button class="btn btn-add" style="background:#4CAF50" onclick="submitScore(1)">+1</button>
-                <button class="btn btn-add" style="background:#4CAF50" onclick="submitScore(5)">+5</button>
-                <button class="btn btn-add" style="background:#4CAF50" onclick="submitScore(10)">+10</button>
-                <button class="btn btn-add" style="background:#4CAF50" onclick="submitScore(20)">+20</button>
+            <div class="quick-btns">
+                <button class="quick-btn" onclick="submitScore(1)">+1</button>
+                <button class="quick-btn" onclick="submitScore(5)">+5</button>
+                <button class="quick-btn" onclick="submitScore(10)">+10</button>
+                <button class="quick-btn" onclick="submitScore(20)">+20</button>
             </div>
-            <div class="modal-buttons" style="margin-top: 10px;">
-                <button class="btn btn-secondary" style="flex:2" onclick="submitCustomScore()">确认</button>
+            <div class="modal-btns">
+                <button class="btn btn-success" onclick="submitCustomScore()">确认</button>
                 <button class="btn btn-danger" onclick="closeScoreModal()">取消</button>
             </div>
         </div>
@@ -150,139 +318,115 @@
 
     <script>
         const API_BASE = window.location.origin;
-        let currentRoom = '';
-        let currentPlayer = '';
-        let players = {};
-        let targetPlayer = '';
-        let pollInterval = null;
-        let isHost = false;
+        let currentRoom = '', currentPlayer = '', players = {}, history = [];
+        let pollInterval = null, isHost = false;
 
-        // 轮询获取房间状态
         async function pollRoom() {
-            if (!currentRoom || !currentPlayer) return;
-            
+            if (!currentRoom) return;
             try {
                 const res = await fetch(`${API_BASE}/api/room/${currentRoom}`);
                 const data = await res.json();
-                
                 if (data.players) {
                     const oldPlayers = JSON.stringify(players);
                     players = data.players;
+                    history = data.history || [];
                     
-                    // 检测玩家加入/离开
-                    const newPlayers = Object.keys(players);
-                    const oldKeys = Object.keys(JSON.parse(oldPlayers));
-                    
-                    // 第一个加入的是房主
                     const playerNames = Object.keys(players);
                     isHost = playerNames.length > 0 && playerNames[0] === currentPlayer;
                     
-                    // 更新按钮权限
+                    document.getElementById('hostTag').style.display = isHost ? 'inline' : 'none';
                     document.getElementById('settlementBtn').textContent = isHost ? '💰 清算(房主)' : '💰 查看清算';
-                    document.getElementById('resetBtn').style.display = isHost ? 'block' : 'none';
-                    
-                    newPlayers.forEach(p => {
-                        if (!oldKeys.includes(p) && p !== currentPlayer) {
-                            showToast(`${p} 加入了房间`);
-                        }
-                    });
-                    oldKeys.forEach(p => {
-                        if (!newPlayers.includes(p) && p !== currentPlayer) {
-                            showToast(`${p} 离开了房间`);
-                        }
-                    });
                     
                     renderPlayers();
+                    renderHistory();
                 }
-            } catch (e) {
-                console.error('Poll error:', e);
-            }
+            } catch (e) { console.error(e); }
         }
 
-        // 开始轮询
         function startPolling() {
             pollRoom();
             pollInterval = setInterval(pollRoom, 2000);
         }
 
-        // 停止轮询
         function stopPolling() {
-            if (pollInterval) {
-                clearInterval(pollInterval);
-                pollInterval = null;
-            }
+            if (pollInterval) clearInterval(pollInterval);
         }
 
-        // 加入房间
         async function joinRoom() {
             const roomCode = document.getElementById('roomCode').value.trim();
             const playerName = document.getElementById('playerName').value.trim();
+            if (!roomCode || !playerName) return showToast('请输入房间号和名字');
             
-            if (!roomCode || !playerName) {
-                showToast('请输入房间号和名字');
-                return;
-            }
-
             try {
                 const res = await fetch(`${API_BASE}/api/join`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ roomCode, playerName })
                 });
                 const data = await res.json();
+                if (data.error) return showToast(data.error);
                 
-                if (data.error) {
-                    showToast(data.error);
-                    return;
-                }
-
                 currentRoom = roomCode;
                 currentPlayer = playerName;
                 players = data.players || {};
-
+                history = data.history || [];
+                
                 showScreen('gameScreen');
                 document.getElementById('displayRoomCode').textContent = roomCode;
                 document.getElementById('displayPlayerName').textContent = playerName;
-                
                 startPolling();
-            } catch (e) {
-                showToast('连接失败，请检查网络');
-            }
+            } catch (e) { showToast('连接失败'); }
         }
 
-        // 创建新房
-        function showCreateRoom() {
+        function createRoom() {
             const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
             document.getElementById('roomCode').value = roomCode;
-            showToast(`已生成房间号: ${roomCode}`);
+            showToast(`房间号: ${roomCode}`);
         }
 
-        // 渲染玩家列表
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+        }
+
         function renderPlayers() {
             const list = document.getElementById('playerList');
-            list.innerHTML = '';
-            
-            Object.entries(players).forEach(([name, data]) => {
+            list.innerHTML = Object.entries(players).map(([name, data]) => {
                 const isMe = name === currentPlayer;
                 const scoreClass = data.score < 0 ? 'negative' : '';
-                
-                list.innerHTML += `
+                const initial = name.charAt(0).toUpperCase();
+                return `
                     <div class="player-card">
-                        <div>
-                            <div class="player-name">${name} ${isMe ? '(你)' : ''}</div>
+                        <div class="player-info">
+                            <div class="player-avatar">${initial}</div>
+                            <div class="player-name">${name} ${isMe ? '<small>(你)</small>' : ''}</div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:12px">
                             <div class="player-score ${scoreClass}">${data.score}</div>
+                            ${!isMe ? `<button class="btn-give" onclick="openScoreModal('${name}')">给分</button>` : ''}
                         </div>
-                        ${!isMe ? `
-                        <div class="player-actions">
-                            <button class="btn-add" onclick="openScoreModal('${name}')">给分</button>
-                        </div>
-                        ` : ''}
                     </div>
                 `;
-            });
+            }).join('');
         }
 
-        // 打开记分弹窗
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            if (!history || history.length === 0) {
+                list.innerHTML = '<div class="history-empty">暂无记录</div>';
+                return;
+            }
+            list.innerHTML = history.slice(0, 50).map(h => `
+                <div class="history-item">
+                    <span class="history-from">${h.from}</span>
+                    <span class="history-arrow">→</span>
+                    <span class="history-to">${h.to}</span>
+                    <span class="history-score">+${h.score}</span>
+                </div>
+            `).join('');
+        }
+
         function openScoreModal(playerName) {
             targetPlayer = playerName;
             document.getElementById('scoreModalTitle').textContent = `给 ${playerName} 多少分`;
@@ -290,154 +434,94 @@
             document.getElementById('scoreModal').classList.add('active');
         }
 
-        // 关闭记分弹窗
         function closeScoreModal() {
             document.getElementById('scoreModal').classList.remove('active');
         }
 
-        // 提交自定义分数
         async function submitCustomScore() {
             const input = document.getElementById('scoreInput').value;
-            if (!input) {
-                showToast('请输入分数');
-                return;
-            }
-            
+            if (!input) return showToast('请输入分数');
             const score = parseInt(input);
-            if (isNaN(score) || score <= 0) {
-                showToast('请输入正分数');
-                return;
-            }
-            
+            if (isNaN(score) || score <= 0) return showToast('请输入正分数');
             await submitScore(score);
         }
 
-        // 提交分数 - 你给多少，自己扣多少
         async function submitScore(score) {
             try {
-                // 给目标玩家加分数
                 await fetch(`${API_BASE}/api/score`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        roomCode: currentRoom,
-                        playerName: currentPlayer,
-                        targetPlayer: targetPlayer,
-                        score: score
-                    })
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomCode: currentRoom, playerName: currentPlayer, targetPlayer, score })
                 });
-                
-                // 给自己扣分
                 await fetch(`${API_BASE}/api/score`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        roomCode: currentRoom,
-                        playerName: currentPlayer,
-                        targetPlayer: currentPlayer,
-                        score: -score
-                    })
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomCode: currentRoom, playerName: currentPlayer, targetPlayer: currentPlayer, score: -score })
                 });
-                
                 closeScoreModal();
                 pollRoom();
-            } catch (e) {
-                showToast('记分失败');
-            }
+            } catch (e) { showToast('记分失败'); }
         }
 
-        // 清算
         async function showSettlement() {
-            if (!isHost) {
-                // 非房主只能查看，不能触发重新开始
-                document.getElementById('resetBtn').style.display = 'none';
-            } else {
-                document.getElementById('resetBtn').style.display = 'block';
-            }
-            
             try {
                 const res = await fetch(`${API_BASE}/api/settlement/${currentRoom}`);
                 const data = await res.json();
-                showSettlementResult(data.settlement || []);
-            } catch (e) {
-                showToast('清算失败');
-            }
+                renderSettlement(data.settlement || []);
+            } catch (e) { showToast('清算失败'); }
         }
 
-        // 显示清算结果
-        function showSettlementResult(settlement) {
+        function renderSettlement(settlement) {
             const list = document.getElementById('settlementList');
-            list.innerHTML = '';
-            
             if (!settlement || settlement.length === 0) {
-                list.innerHTML = '<div class="settlement">已结清，无需清算</div>';
+                list.innerHTML = '<div class="settlement-empty">已结清，无需清算 ✓</div>';
             } else {
-                settlement.forEach(item => {
-                    list.innerHTML += `
-                        <div class="settlement">
-                            <div class="settlement-item">
-                                <span class="settlement-from">${item.from}</span>
-                                <span>→</span>
-                                <span class="settlement-to">${item.to}</span>
-                            </div>
-                            <div class="settlement-item" style="justify-content: center; font-size: 24px;">
-                                <strong>${item.amount}</strong>
-                            </div>
+                list.innerHTML = settlement.map(s => `
+                    <div class="settlement-item">
+                        <div class="settlement-flow">
+                            <span class="settlement-from">${s.from}</span>
+                            <span class="settlement-arrow">→</span>
+                            <span class="settlement-to">${s.to}</span>
                         </div>
-                    `;
-                });
+                        <div class="settlement-amount">${s.amount}</div>
+                    </div>
+                `).join('');
             }
-            
+            document.getElementById('resetBtn').style.display = isHost ? 'block' : 'none';
             showScreen('settlementScreen');
         }
 
-        // 返回游戏
         function backToGame() {
             showScreen('gameScreen');
         }
 
-        // 重新开始
         async function resetGame() {
-            if (!isHost) {
-                showToast('只有房主可以重新开始');
-                return;
-            }
-            
+            if (!isHost) return showToast('只有房主可以重置');
             try {
                 await fetch(`${API_BASE}/api/reset`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ roomCode: currentRoom })
                 });
                 showToast('游戏已重新开始');
                 backToGame();
                 pollRoom();
-            } catch (e) {
-                showToast('重置失败');
-            }
+            } catch (e) { showToast('重置失败'); }
         }
 
-        // 离开房间
-        async function leaveRoom() {
+        function leaveRoom() {
             stopPolling();
-            currentRoom = '';
-            currentPlayer = '';
-            players = {};
+            currentRoom = ''; currentPlayer = ''; players = {}; history = [];
             showScreen('joinScreen');
         }
 
-        // 切换画面
-        function showScreen(screenId) {
+        function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
+            document.getElementById(id).classList.add('active');
         }
 
-        // 显示提示
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
         }
     </script>
 </body>
