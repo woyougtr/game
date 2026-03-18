@@ -228,7 +228,7 @@
             display: flex; align-items: center; gap: 12px;
             background: var(--bg); padding: 8px 12px; border-radius: 8px;
         }
-        .give-all-item .player-name { flex: 1; text-align: left; }
+        .give-all-item .player-name { flex: 1; text-align: left; min-width: 100px; }
         .give-all-item input {
             width: 70px; padding: 8px; border-radius: 6px;
             border: 1px solid #334155; background: var(--card-bg);
@@ -393,11 +393,12 @@
         
         let currentRoom = localStorage.getItem('roomCode') || '';
         let currentPlayer = localStorage.getItem('playerName') || '';
+        let joinTime = parseInt(localStorage.getItem('joinTime') || '0');
         let players = {}, history = {};
         let pollInterval = null, isHost = false;
 
-        // 页面加载时自动重新加入
-        if (currentRoom && currentPlayer) {
+        // 3分钟内刷新才自动加入（通过设备ID判断）
+        if (currentRoom && currentPlayer && deviceId && joinTime && (Date.now() - joinTime < 3 * 60 * 1000)) {
             setTimeout(async () => {
                 document.getElementById('roomCode').value = currentRoom;
                 document.getElementById('playerName').value = currentPlayer;
@@ -475,6 +476,7 @@
                 // 保存到 localStorage
                 localStorage.setItem('roomCode', roomCode);
                 localStorage.setItem('playerName', playerName);
+                localStorage.setItem('joinTime', Date.now().toString());
                 
                 showScreen('gameScreen');
                 document.getElementById('displayRoomCode').textContent = roomCode;
