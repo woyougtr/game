@@ -221,19 +221,16 @@
         }
         
         .give-all-list {
-            max-height: 300px; overflow-y: auto;
-            display: flex; flex-direction: column; gap: 10px;
+            max-height: 200px; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 8px;
         }
         .give-all-item {
             display: flex; align-items: center; gap: 12px;
-            background: var(--bg); padding: 10px 14px; border-radius: 10px;
+            background: var(--bg); padding: 8px 12px; border-radius: 8px;
         }
-        .give-all-item .player-avatar {
-            width: 36px; height: 36px; font-size: 14px;
-        }
-        .give-all-item .player-name { flex: 1; }
+        .give-all-item .player-name { flex: 1; text-align: left; }
         .give-all-item input {
-            width: 80px; padding: 8px; border-radius: 8px;
+            width: 70px; padding: 8px; border-radius: 6px;
             border: 1px solid #334155; background: var(--card-bg);
             color: var(--text); text-align: center; font-size: 16px;
         }
@@ -247,8 +244,8 @@
         }
         .modal-overlay.active { display: flex; }
         .modal {
-            background: var(--card-bg); padding: 28px; border-radius: 20px;
-            width: 100%; max-width: 360px; border: 1px solid #475569;
+            background: var(--card-bg); padding: 20px; border-radius: 16px;
+            width: 90%; max-width: 320px; border: 1px solid #475569;
             animation: modalIn 0.2s;
         }
         @keyframes modalIn { from { transform: scale(0.9); opacity: 0; } }
@@ -567,10 +564,8 @@
             
             const list = document.getElementById('giveAllList');
             list.innerHTML = otherPlayers.map(name => {
-                const initial = name.charAt(0).toUpperCase();
                 return `
                     <div class="give-all-item">
-                        <div class="player-avatar">${initial}</div>
                         <div class="player-name">${name}</div>
                         <input type="number" id="score-${name}" placeholder="0" inputmode="numeric">
                     </div>
