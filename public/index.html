@@ -307,7 +307,7 @@
             <div class="room-header">
                 <div style="display:flex;justify-content:space-between;align-items:center">
                     <button class="btn-icon" onclick="showSettlement()">💰 清算</button>
-                    <div class="room-code">房间号 <strong id="displayRoomCode"></strong> <button onclick="copyRoomCode()" style="background:none;border:none;color:#a78bfa;cursor:pointer;font-size:16px">📋</button></div>
+                    <div class="room-code">房间号 <strong id="displayRoomCode"></strong> <button onclick="copyRoomCode()" style="background:none;border:none;color:#a78bfa;cursor:pointer;font-size:16px">📋</button> <button onclick="showShareQR()" style="background:none;border:none;color:#a78bfa;cursor:pointer;font-size:16px">📱</button></div>
                     <button class="btn-icon btn-danger-icon" onclick="leaveRoom()">✕ 离开</button>
                 </div>
                 <div class="player-badge">
@@ -379,6 +379,21 @@
             </div>
         </div>
     </div>
+    <div id="qrModal" class="modal-overlay">
+        <div class="modal" style="max-width:350px">
+            <h3>扫码加入房间</h3>
+            <div style="text-align:center;padding:20px">
+                <img id="qrImage" style="width:200px;height:200px;border-radius:12px" crossorigin="anonymous">
+            </div>
+            <div style="text-align:center;color:#94a3b8;font-size:14px;margin-bottom:16px">
+                房间号: <span id="qrRoomCode" style="color:#a78bfa;font-weight:bold"></span>
+            </div>
+            <div class="modal-btns">
+                <button class="btn btn-primary" onclick="document.getElementById('qrModal').style.display='none'" style="width:100%">关闭</button>
+            </div>
+        </div>
+    </div>
+    </div>
 
     <div id="toast" class="toast"></div>
 
@@ -389,6 +404,13 @@
         if (!deviceId) {
             deviceId = 'device_' + Math.random().toString(36).substring(2, 15) + Date.now();
             localStorage.setItem('deviceId', deviceId);
+        }
+        
+        // 检查 URL 参数，自动填写房间号
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomFromUrl = urlParams.get('room');
+        if (roomFromUrl) {
+            document.getElementById('roomCode').value = roomFromUrl;
         }
         
         let currentRoom = localStorage.getItem('roomCode') || '';
@@ -496,6 +518,14 @@
             navigator.clipboard.writeText(code).then(() => {
                 showToast('房间号已复制');
             });
+        }
+        
+        function showShareQR() {
+            const code = document.getElementById('displayRoomCode').textContent;
+            document.getElementById('qrRoomCode').textContent = code;
+            // 使用二维码 API 生成二维码
+            document.getElementById('qrImage').src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(window.location.origin + '?room=' + code);
+            document.getElementById('qrModal').style.display = 'flex';
         }
 
         function switchTab(tab) {
