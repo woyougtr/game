@@ -394,10 +394,22 @@
 
         // 页面加载时自动重新加入
         if (currentRoom && currentPlayer) {
-            setTimeout(() => {
+            setTimeout(async () => {
                 document.getElementById('roomCode').value = currentRoom;
                 document.getElementById('playerName').value = currentPlayer;
-                joinRoom(true);
+                try {
+                    const res = await fetch(`${API_BASE}/api/join`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ roomCode: currentRoom, playerName: currentPlayer })
+                    });
+                    const data = await res.json();
+                    if (data.error) {
+                        // 名字被占用，加个随机后缀重试
+                        const newName = currentPlayer + Math.floor(Math.random() * 100);
+                        localStorage.setItem('playerName', newName);
+                        location.reload();
+                    }
+                } catch (e) {}
             }, 100);
         }
 
