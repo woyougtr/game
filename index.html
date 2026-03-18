@@ -64,6 +64,13 @@
         .btn-secondary:hover { background: #475569; }
         .btn-danger { background: var(--danger); }
         .btn-danger:hover { background: #dc2626; }
+        .btn-purple { 
+            background: linear-gradient(135deg, #8b5cf6, #a855f7); 
+            color: #fff;
+        }
+        .btn-purple:hover { 
+            background: linear-gradient(135deg, #7c3aed, #9333ea); 
+        }
         .btn-success { background: var(--success); }
         .btn-success:hover { background: #16a34a; }
         
@@ -302,7 +309,7 @@
             </div>
             
             <div id="tab-players" class="tab-content active">
-                <button class="btn" style="margin-bottom:16px;background:linear-gradient(135deg,#8b5cf6,#a855f7)" onclick="openGiveAllModal()">✨ 一键给所有人分</button>
+                <button class="btn btn-purple" style="margin-bottom:16px" onclick="openGiveAllModal()">一键给分</button>
                 <div id="playerList" class="player-list"></div>
             </div>
             
