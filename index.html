@@ -201,6 +201,25 @@
             background: linear-gradient(135deg, #8b5cf6, #a855f7);
         }
         
+        .give-all-list {
+            max-height: 300px; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .give-all-item {
+            display: flex; align-items: center; gap: 12px;
+            background: var(--bg); padding: 10px 14px; border-radius: 10px;
+        }
+        .give-all-item .player-avatar {
+            width: 36px; height: 36px; font-size: 14px;
+        }
+        .give-all-item .player-name { flex: 1; }
+        .give-all-item input {
+            width: 80px; padding: 8px; border-radius: 8px;
+            border: 1px solid #334155; background: var(--card-bg);
+            color: var(--text); text-align: center; font-size: 16px;
+        }
+        .give-all-item input:focus { outline: none; border-color: var(--primary); }
+        
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0;
             width: 100%; height: 100%; background: rgba(0,0,0,0.8);
@@ -334,18 +353,12 @@
 
     <!-- 一键给分弹窗 -->
     <div id="giveAllModal" class="modal-overlay">
-        <div class="modal">
+        <div class="modal" style="max-width:450px">
             <h3>一键给所有人分</h3>
-            <input type="number" id="giveAllScore" placeholder="输入分数" inputmode="numeric">
-            <p style="text-align:center;color:#94a3b8;margin-bottom:16px">每人获得此分数，你扣除相应总分</p>
-            <div class="quick-btns">
-                <button class="quick-btn" onclick="submitGiveAll(1)">+1</button>
-                <button class="quick-btn" onclick="submitGiveAll(5)">+5</button>
-                <button class="quick-btn" onclick="submitGiveAll(10)">+10</button>
-                <button class="quick-btn" onclick="submitGiveAll(20)">+20</button>
-            </div>
-            <div class="modal-btns">
-                <button class="btn btn-success" onclick="submitGiveAllCustom()">确认</button>
+            <p style="text-align:center;color:#94a3b8;margin-bottom:16px">填写每人获得的分数，确定后统一结算</p>
+            <div id="giveAllList" class="give-all-list"></div>
+            <div class="modal-btns" style="margin-top:16px">
+                <button class="btn btn-success" onclick="submitGiveAll()">统一结算</button>
                 <button class="btn btn-danger" onclick="closeGiveAllModal()">取消</button>
             </div>
         </div>
@@ -490,7 +503,20 @@
         }
 
         function openGiveAllModal() {
-            document.getElementById('giveAllScore').value = '';
+            const otherPlayers = Object.keys(players).filter(p => p !== currentPlayer);
+            if (otherPlayers.length === 0) return showToast('没有其他玩家');
+            
+            const list = document.getElementById('giveAllList');
+            list.innerHTML = otherPlayers.map(name => {
+                const initial = name.charAt(0).toUpperCase();
+                return `
+                    <div class="give-all-item">
+                        <div class="player-avatar">${initial}</div>
+                        <div class="player-name">${name}</div>
+                        <input type="number" id="score-${name}" placeholder="0" inputmode="numeric">
+                    </div>
+                `;
+            }).join('');
             document.getElementById('giveAllModal').classList.add('active');
         }
 
@@ -498,28 +524,31 @@
             document.getElementById('giveAllModal').classList.remove('active');
         }
 
-        async function submitGiveAllCustom() {
-            const input = document.getElementById('giveAllScore').value;
-            if (!input) return showToast('请输入分数');
-            const score = parseInt(input);
-            if (isNaN(score) || score <= 0) return showToast('请输入正分数');
-            await submitGiveAll(score);
-        }
-
-        async function submitGiveAll(score) {
+        async function submitGiveAll() {
             const otherPlayers = Object.keys(players).filter(p => p !== currentPlayer);
-            if (otherPlayers.length === 0) return showToast('没有其他玩家');
+            const scores = [];
+            
+            for (const player of otherPlayers) {
+                const input = document.getElementById(`score-${player}`).value;
+                if (input) {
+                    const score = parseInt(input);
+                    if (score > 0) {
+                        scores.push({ player, score });
+                    }
+                }
+            }
+            
+            if (scores.length === 0) return showToast('请至少填写一个分数');
             
             try {
-                // 给每个其他玩家加分，自己扣总分
-                for (const player of otherPlayers) {
+                for (const { player, score } of scores) {
                     await fetch(`${API_BASE}/api/score`, {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ roomCode: currentRoom, playerName: currentPlayer, targetPlayer: player, score })
                     });
                 }
                 closeGiveAllModal();
-                showToast(`已给 ${otherPlayers.length} 人各 +${score}`);
+                showToast(`已给 ${scores.length} 人记分`);
                 pollRoom();
             } catch (e) { showToast('记分失败'); }
         }
