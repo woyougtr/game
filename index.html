@@ -98,9 +98,17 @@
             border-radius: 14px; display: flex; justify-content: space-between; align-items: center;
             border: 1px solid #334155;
             transition: transform 0.2s, border-color 0.2s;
+            min-height: 70px;
         }
-        .player-left { display: flex; align-items: center; gap: 12px; flex: 1; }
-        .player-right { display: flex; align-items: center; gap: 12px; }
+        .player-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+        .player-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .player-score { 
+            font-size: 28px; font-weight: bold; min-width: 80px; text-align: right;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
         .player-card:hover { border-color: #475569; }
         
         .player-info { display: flex; align-items: center; gap: 10px; }
@@ -113,13 +121,6 @@
         .player-name { font-size: 17px; font-weight: 600; }
         .player-name small { color: var(--text-secondary); font-weight: normal; }
         
-        .player-score {
-            font-size: 28px; font-weight: bold;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
         .player-score.negative {
             background: linear-gradient(135deg, #f87171, #ef4444);
             -webkit-background-clip: text;
