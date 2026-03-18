@@ -94,7 +94,7 @@
         
         .player-list { display: flex; flex-direction: column; gap: 12px; }
         .player-card {
-            background: var(--card-bg); padding: 16px 20px;
+            background: var(--card-bg); padding: 14px 16px;
             border-radius: 14px; display: flex; justify-content: space-between; align-items: center;
             border: 1px solid #334155;
             transition: transform 0.2s, border-color 0.2s;
@@ -125,9 +125,10 @@
         }
         
         .btn-give {
-            padding: 10px 20px; border: none; border-radius: 10px;
+            padding: 8px 16px; border: none; border-radius: 8px;
             background: linear-gradient(135deg, var(--success), #10b981);
             color: #fff; font-weight: 600; cursor: pointer; transition: transform 0.1s;
+            white-space: nowrap;
         }
         .btn-give:active { transform: scale(0.95); }
         
@@ -402,9 +403,9 @@
                             <div class="player-avatar">${initial}</div>
                             <div class="player-name">${name} ${isMe ? '<small>(你)</small>' : ''}</div>
                         </div>
-                        <div style="display:flex;align-items:center;gap:12px">
+                        <div style="display:flex;align-items:center;gap:16px">
                             <div class="player-score ${scoreClass}">${data.score}</div>
-                            ${!isMe ? `<button class="btn-give" onclick="openScoreModal('${name}')">给分</button>` : ''}
+                            ${!isMe ? `<button class="btn-give" onclick="openScoreModal('${name}')">给 分</button>` : ''}
                         </div>
                     </div>
                 `;
@@ -448,13 +449,10 @@
 
         async function submitScore(score) {
             try {
+                // 一次请求完成：目标加分，自己扣分
                 await fetch(`${API_BASE}/api/score`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ roomCode: currentRoom, playerName: currentPlayer, targetPlayer, score })
-                });
-                await fetch(`${API_BASE}/api/score`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ roomCode: currentRoom, playerName: currentPlayer, targetPlayer: currentPlayer, score: -score })
                 });
                 closeScoreModal();
                 pollRoom();

@@ -52,13 +52,15 @@ export default async function handler(req, res) {
                 rooms[roomCode].players[playerName].score -= score;
             }
             
-            // 记录
-            rooms[roomCode].history.unshift({
-                from: playerName,
-                to: targetPlayer,
-                score: score,
-                time: Date.now()
-            });
+            // 只记录给分那一条（不记录自己给自己扣分）
+            if (playerName !== targetPlayer) {
+                rooms[roomCode].history.unshift({
+                    from: playerName,
+                    to: targetPlayer,
+                    score: score,
+                    time: Date.now()
+                });
+            }
             
             return res.json({ 
                 success: true, 
