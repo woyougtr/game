@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     try {
         // 加入房间 - POST /api/join
         if (req.url === '/api/join' && method === 'POST') {
-            const { roomCode, playerName } = req.body || {};
+            const { roomCode, playerName, deviceId } = req.body || {};
             
             if (!roomCode || !playerName) {
                 return res.status(400).json({ error: '缺少参数' });
@@ -25,11 +25,30 @@ export default async function handler(req, res) {
                 rooms[roomCode] = { players: {}, history: [] };
             }
             
-            if (rooms[roomCode].players[playerName]) {
-                return res.status(400).json({ error: '名字已被使用' });
+            // 检查设备ID是否已存在（刷新后重新加入）
+            let existingPlayer = null;
+            for (const [name, data] of Object.entries(rooms[roomCode].players)) {
+                if (data.deviceId === deviceId) {
+                    existingPlayer = name;
+                    break;
+                }
             }
             
-            rooms[roomCode].players[playerName] = { score: 0 };
+            if (existingPlayer && existingPlayer !== playerName) {
+                // 设备ID已存在但名字不同，需要更新名字
+                rooms[roomCode].players[playerName] = { 
+                    score: rooms[roomCode].players[existingPlayer].score,
+                    deviceId 
+                };
+                delete rooms[roomCode].players[existingPlayer];
+            } else if (existingPlayer && existingPlayer === playerName) {
+                // 同一个玩家刷新，直接返回
+            } else if (rooms[roomCode].players[playerName]) {
+                return res.status(400).json({ error: '名字已被使用' });
+            } else {
+                // 新玩家
+                rooms[roomCode].players[playerName] = { score: 0, deviceId };
+            }
             
             return res.json({ 
                 players: sanitizePlayers(rooms[roomCode].players),
