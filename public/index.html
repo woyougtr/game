@@ -310,13 +310,13 @@
         <!-- 游戏页面 -->
         <div id="gameScreen" class="screen">
             <div class="room-header">
-                <div class="room-code" style="justify-content:center;margin-bottom:8px">房间号 <strong id="displayRoomCode"></strong> <button onclick="copyRoomCode()" class="share-btn">复制</button> <button onclick="showShareQR()" class="share-btn" style="background:linear-gradient(135deg,#a78bfa,#f472b6)">分享</button></div>
+                <div class="room-code" style="justify-content:center;margin-bottom:12px">房间号 <strong id="displayRoomCode"></strong> <button onclick="copyRoomCode()" class="share-btn">复制</button> <button onclick="showShareQR()" class="share-btn" style="background:linear-gradient(135deg,#a78bfa,#f472b6)">分享</button></div>
                 <div style="display:flex;justify-content:space-between;align-items:center">
-                    <div class="player-badge">
-                        <span id="displayPlayerName"></span>
-                        <span id="hostTag" class="host-badge" style="display:none">房主</span>
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <span id="displayPlayerName" style="color:#f8fafc;font-weight:500"></span>
+                        <span id="hostTag" class="host-badge" style="display:none;background:#6366f1;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px">房主</span>
                     </div>
-                    <button class="btn-icon btn-danger-icon" onclick="leaveRoom()">离开</button>
+                    <button onclick="leaveRoom()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:13px">退出</button>
                 </div>
             </div>
             
