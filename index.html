@@ -287,7 +287,7 @@
             document.getElementById('scoreModal').classList.remove('active');
         }
 
-        // 提交分数
+        // 提交分数 - 你给别多少，自己扣多少
         async function submitScore(score) {
             const input = document.getElementById('scoreInput').value;
             if (input) {
@@ -299,6 +299,7 @@
             }
             
             try {
+                // 给目标玩家加分数，自己扣分数
                 await fetch(`${API_BASE}/api/score`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -309,8 +310,21 @@
                         score: score
                     })
                 });
+                
+                // 给自己扣分
+                await fetch(`${API_BASE}/api/score`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        roomCode: currentRoom,
+                        playerName: currentPlayer,
+                        targetPlayer: currentPlayer,
+                        score: -score
+                    })
+                });
+                
                 closeScoreModal();
-                pollRoom(); // 立即刷新
+                pollRoom();
             } catch (e) {
                 showToast('记分失败');
             }
