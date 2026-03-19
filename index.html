@@ -98,12 +98,13 @@
         .share-btn:hover { background: var(--primary); color: #fff; }
         .player-badge {
             display: inline-block; margin-top: 8px; padding: 6px 14px;
-            background: var(--primary); border-radius: 20px; font-size: 14px;
+            background: var(--primary); border-radius: 20px; font-size: 14px; color: #fff;
         }
         .host-badge {
             background: linear-gradient(135deg, #f59e0b, #ef4444);
             padding: 4px 10px; border-radius: 12px; font-size: 12px; margin-left: 8px;
             color: #fff;
+            font-weight: 600;
         }
         .btn-icon {
             background: #334155; border: none; padding: 6px 12px; border-radius: 6px;
@@ -348,8 +349,8 @@
                 <div class="room-code" style="justify-content:center;margin-bottom:12px">房间号 <strong id="displayRoomCode"></strong> <button onclick="copyRoomCode()" class="share-btn">复制</button> <button onclick="showShareQR()" class="share-btn" style="background:rgba(59,130,246,0.1);border-color:#3b82f6;color:#3b82f6">分享</button> <button onclick="addBotPlayer()" class="share-btn" style="background:rgba(16,185,129,0.1);border-color:#10b981;color:#10b981">+机器人</button></div>
                 <div style="display:flex;justify-content:center;align-items:center;gap:8px">
                     <span id="displayAvatar" style="font-size:24px;cursor:pointer" onclick="showAvatarModal()"></span>
-                    <span id="displayPlayerName" style="color:#f8fafc;font-weight:500;font-size:15px"></span>
-                    <span id="hostTag" style="display:none;background:#6366f1;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px">房主</span>
+                    <span id="displayPlayerName" style="color:var(--text);font-weight:600;font-size:16px"></span>
+                    <span id="hostTag" style="display:none;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:600">房主</span>
                 </div>
             </div>
             
