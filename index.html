@@ -226,18 +226,18 @@
         }
         
         .give-all-list {
-            max-height: 250px; overflow-y: auto;
+            max-height: 70vh; overflow-y: auto;
             display: flex; flex-direction: column; gap: 2px;
         }
         .give-all-item {
             display: flex; align-items: center; justify-content: space-between;
-            background: var(--bg); padding: 8px 12px; border-radius: 8px;
+            background: var(--bg); padding: 10px 14px; border-radius: 8px;
         }
-        .give-all-item .player-name { font-size: 16px; margin-right: 10px; }
+        .give-all-item .player-name { font-size: 16px; flex: 1; }
         .give-all-item input {
-            width: 70px; padding: 8px; border-radius: 6px;
+            width: 60%; padding: 10px 14px; border-radius: 8px;
             border: 1px solid #334155; background: var(--card-bg);
-            color: var(--text); text-align: center; font-size: 15px;
+            color: var(--text); text-align: right; font-size: 16px;
         }
         .give-all-item input:focus { outline: none; border-color: var(--primary); }
         
@@ -385,7 +385,7 @@
 
     <!-- 一键给分弹窗 -->
     <div id="giveAllModal" class="modal-overlay">
-        <div class="modal" style="max-width:450px">
+        <div class="modal" style="max-width:90vw;max-height:85vh">
             <h3>一键给所有人分</h3>
             <p style="text-align:center;color:#94a3b8;margin-bottom:16px">填写每人获得的分数，确定后统一结算</p>
             <div id="giveAllList" class="give-all-list"></div>
