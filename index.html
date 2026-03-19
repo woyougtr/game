@@ -68,6 +68,8 @@
         .btn:hover { background: #0284c7; }
         .btn-secondary { background: var(--border); color: var(--text); }
         .btn-secondary:hover { background: #d1d5db; }
+        .btn-primary { background: var(--primary); }
+        .btn-primary:hover { background: #0284c7; }
         .btn-danger { background: var(--danger); }
         .btn-danger:hover { background: #dc2626; }
         
@@ -286,7 +288,7 @@
         .quick-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
         .quick-btn {
             padding: 14px; border: none; border-radius: 10px;
-            background: linear-gradient(135deg, var(--success), #10b981);
+            background: linear-gradient(135deg, var(--primary), #06b6d4);
             color: #fff; font-size: 16px; font-weight: 600; cursor: pointer;
         }
         .quick-btn:active { transform: scale(0.95); }
@@ -401,8 +403,8 @@
                 <button class="quick-btn" onclick="submitScore(20)">+20</button>
             </div>
             <div class="modal-btns">
-                <button class="btn btn-success" onclick="submitCustomScore()">确认</button>
                 <button class="btn btn-danger" onclick="closeScoreModal()">取消</button>
+                <button class="btn btn-primary" onclick="submitCustomScore()">确认</button>
             </div>
         </div>
     </div>
