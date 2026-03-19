@@ -291,6 +291,18 @@
         
         .tab-content { display: none; }
         .tab-content.active { display: block; min-height: calc(100vh - 280px); }
+        
+        .avatar-option {
+            width: 50px; height: 50px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; cursor: pointer;
+            border: 3px solid transparent; transition: all 0.2s;
+            background: var(--card-bg);
+        }
+        .avatar-option:hover { transform: scale(1.1); }
+        .avatar-option.selected { border-color: var(--primary); transform: scale(1.1); }
+        .player-avatar { cursor: pointer; }
+        .player-avatar:hover { opacity: 0.8; }
     </style>
 </head>
 <body>
@@ -312,6 +324,7 @@
             <div class="room-header">
                 <div class="room-code" style="justify-content:center;margin-bottom:12px">房间号 <strong id="displayRoomCode"></strong> <button onclick="copyRoomCode()" class="share-btn">复制</button> <button onclick="showShareQR()" class="share-btn" style="background:linear-gradient(135deg,#a78bfa,#f472b6)">分享</button></div>
                 <div style="display:flex;justify-content:center;align-items:center;gap:8px">
+                    <span id="displayAvatar" style="font-size:24px;cursor:pointer" onclick="showAvatarModal()"></span>
                     <span id="displayPlayerName" style="color:#f8fafc;font-weight:500;font-size:15px"></span>
                     <span id="hostTag" style="display:none;background:#6366f1;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px">房主</span>
                 </div>
@@ -396,18 +409,37 @@
             </div>
         </div>
     </div>
+
+    <!-- 头像选择弹窗 -->
+    <div id="avatarModal" class="modal-overlay">
+        <div class="modal" style="max-width:350px">
+            <h3>选择头像</h3>
+            <div id="avatarGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;max-height:300px;overflow-y:auto"></div>
+            <div class="modal-btns">
+                <button class="btn btn-secondary" onclick="closeAvatarModal()">取消</button>
+                <button class="btn btn-success" onclick="confirmAvatar()">确定</button>
+            </div>
+        </div>
+    </div>
     </div>
 
     <div id="toast" class="toast"></div>
 
     <script>
         const API_BASE = '';
+        // 头像列表
+        const AVATARS = ['😀', '😎', '🤔', '🥳', '😇', '🤓', '😼', '🦊', '🐶', '🐱', '🦁', '🐯', '🐻', '🐼', '🐨', '🐰', '🦄', '🐸', '🐵', '🐔', '🐧', '🐦', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🐢', '🐍', '🦎', '🐙', '🦑', '🦐', '🦞', '🦀', '🐡', '🐠', '🐟', '🐬', '🐳', '🦈'];
+        
         // 生成或获取设备ID
         let deviceId = localStorage.getItem('deviceId');
         if (!deviceId) {
             deviceId = 'device_' + Math.random().toString(36).substring(2, 15) + Date.now();
             localStorage.setItem('deviceId', deviceId);
         }
+        
+        // 获取或生成头像
+        let currentAvatar = localStorage.getItem('playerAvatar') || AVATARS[Math.floor(Math.random() * AVATARS.length)];
+        let selectedAvatar = currentAvatar;
         
         // 检查 URL 参数，自动填写房间号
         const urlParams = new URLSearchParams(window.location.search);
@@ -449,6 +481,7 @@
                     showScreen('gameScreen');
                     document.getElementById('displayRoomCode').textContent = currentRoom;
                     document.getElementById('displayPlayerName').textContent = currentPlayer;
+                    document.getElementById('displayAvatar').textContent = currentAvatar;
                     startPolling();
                 } catch (e) {}
             }, 100);
@@ -492,7 +525,7 @@
             try {
                 const res = await fetch(`${API_BASE}/api/join`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ roomCode, playerName, deviceId })
+                    body: JSON.stringify({ roomCode, playerName, deviceId, avatar: currentAvatar })
                 });
                 const data = await res.json();
                 if (data.error) return showToast(data.error);
@@ -510,6 +543,7 @@
                 showScreen('gameScreen');
                 document.getElementById('displayRoomCode').textContent = roomCode;
                 document.getElementById('displayPlayerName').textContent = playerName;
+                document.getElementById('displayAvatar').textContent = currentAvatar;
                 startPolling();
             } catch (e) { showToast('连接失败'); }
         }
@@ -520,6 +554,45 @@
             showToast(`房间号: ${roomCode}`);
             // 创建房间后自动聚焦到名字输入框并弹出键盘
             document.getElementById('playerName').focus();
+        }
+
+        // 头像选择弹窗
+        function showAvatarModal() {
+            selectedAvatar = currentAvatar;
+            const grid = document.getElementById('avatarGrid');
+            grid.innerHTML = AVATARS.map(avatar => `
+                <div class="avatar-option ${avatar === selectedAvatar ? 'selected' : ''}" onclick="selectAvatar('${avatar}')">${avatar}</div>
+            `).join('');
+            document.getElementById('avatarModal').classList.add('active');
+        }
+
+        function selectAvatar(avatar) {
+            selectedAvatar = avatar;
+            document.querySelectorAll('.avatar-option').forEach(el => {
+                el.classList.toggle('selected', el.textContent === avatar);
+            });
+        }
+
+        function closeAvatarModal() {
+            document.getElementById('avatarModal').classList.remove('active');
+        }
+
+        async function confirmAvatar() {
+            currentAvatar = selectedAvatar;
+            localStorage.setItem('playerAvatar', currentAvatar);
+            closeAvatarModal();
+            
+            // 更新服务器上的头像
+            if (currentRoom) {
+                try {
+                    await fetch(`${API_BASE}/api/avatar`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ roomCode: currentRoom, playerName: currentPlayer, avatar: currentAvatar })
+                    });
+                } catch (e) { console.error(e); }
+            }
+            
+            renderPlayers();
         }
 
         function copyRoomCode() {
@@ -549,11 +622,12 @@
             list.innerHTML = Object.entries(players).map(([name, data]) => {
                 const isMe = name === currentPlayer;
                 const scoreClass = data.score < 0 ? 'negative' : '';
-                const initial = name.charAt(0).toUpperCase();
+                const avatar = data.avatar || name.charAt(0).toUpperCase();
+                const avatarClick = isMe ? 'onclick="showAvatarModal()"' : '';
                 return `
                     <div class="player-card" ${!isMe ? `onclick="openScoreModal('${name}')"` : ''}>
                         <div class="player-info">
-                            <div class="player-avatar">${initial}</div>
+                            <div class="player-avatar" ${avatarClick}>${avatar}</div>
                             <div class="player-name">${name} ${isMe ? '<small>(你)</small>' : ''}</div>
                         </div>
                         <div class="player-right">

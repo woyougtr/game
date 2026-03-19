@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     try {
         // 加入房间 - POST /api/join
         if (req.url === '/api/join' && method === 'POST') {
-            const { roomCode, playerName, deviceId } = req.body || {};
+            const { roomCode, playerName, deviceId, avatar } = req.body || {};
             
             if (!roomCode || !playerName) {
                 return res.status(400).json({ error: '缺少参数' });
@@ -38,16 +38,20 @@ export default async function handler(req, res) {
                 // 设备ID已存在但名字不同，需要更新名字
                 rooms[roomCode].players[playerName] = { 
                     score: rooms[roomCode].players[existingPlayer].score,
-                    deviceId 
+                    deviceId,
+                    avatar: avatar || rooms[roomCode].players[existingPlayer]?.avatar
                 };
                 delete rooms[roomCode].players[existingPlayer];
             } else if (existingPlayer && existingPlayer === playerName) {
-                // 同一个玩家刷新，直接返回
+                // 同一个玩家刷新，更新头像
+                if (avatar) {
+                    rooms[roomCode].players[playerName].avatar = avatar;
+                }
             } else if (rooms[roomCode].players[playerName]) {
                 return res.status(400).json({ error: '名字已被使用' });
             } else {
                 // 新玩家
-                rooms[roomCode].players[playerName] = { score: 0, deviceId };
+                rooms[roomCode].players[playerName] = { score: 0, deviceId, avatar };
             }
             
             return res.json({ 
@@ -122,6 +126,22 @@ export default async function handler(req, res) {
             return res.json({ settlement });
         }
         
+        // 更新头像 - POST /api/avatar
+        if (req.url === '/api/avatar' && method === 'POST') {
+            const { roomCode, playerName, avatar } = req.body || {};
+            
+            if (!rooms[roomCode] || !rooms[roomCode].players[playerName]) {
+                return res.status(400).json({ error: '房间或玩家不存在' });
+            }
+            
+            rooms[roomCode].players[playerName].avatar = avatar;
+            
+            return res.json({ 
+                success: true, 
+                players: sanitizePlayers(rooms[roomCode].players)
+            });
+        }
+        
         return res.status(404).json({ error: 'Not found' });
     } catch (e) {
         console.error('API Error:', e);
@@ -132,7 +152,7 @@ export default async function handler(req, res) {
 function sanitizePlayers(roomPlayers) {
     const result = {};
     Object.entries(roomPlayers || {}).forEach(([name, data]) => {
-        result[name] = { score: data.score };
+        result[name] = { score: data.score, avatar: data.avatar };
     });
     return result;
 }
