@@ -322,7 +322,7 @@
         <!-- 游戏页面 -->
         <div id="gameScreen" class="screen">
             <div class="room-header">
-                <div class="room-code" style="justify-content:center;margin-bottom:12px">房间号 <strong id="displayRoomCode"></strong> <button onclick="copyRoomCode()" class="share-btn">复制</button> <button onclick="showShareQR()" class="share-btn" style="background:linear-gradient(135deg,#a78bfa,#f472b6)">分享</button></div>
+                <div class="room-code" style="justify-content:center;margin-bottom:12px">房间号 <strong id="displayRoomCode"></strong> <button onclick="copyRoomCode()" class="share-btn">复制</button> <button onclick="showShareQR()" class="share-btn" style="background:linear-gradient(135deg,#a78bfa,#f472b6)">分享</button> <button onclick="addBotPlayer()" class="share-btn" style="background:linear-gradient(135deg,#22c55e,#16a34a)">+机器人</button></div>
                 <div style="display:flex;justify-content:center;align-items:center;gap:8px">
                     <span id="displayAvatar" style="font-size:24px;cursor:pointer" onclick="showAvatarModal()"></span>
                     <span id="displayPlayerName" style="color:#f8fafc;font-weight:500;font-size:15px"></span>
@@ -582,6 +582,9 @@
             localStorage.setItem('playerAvatar', currentAvatar);
             closeAvatarModal();
             
+            // 更新顶部头像
+            document.getElementById('displayAvatar').textContent = currentAvatar;
+            
             // 更新服务器上的头像
             if (currentRoom) {
                 try {
@@ -797,6 +800,26 @@
             t.textContent = msg;
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // 添加机器人玩家（测试用）
+        async function addBotPlayer() {
+            if (!currentRoom) return;
+            const playerCount = Object.keys(players).length + 1;
+            const botName = `玩家${playerCount}`;
+            const botAvatars = ['🤖', '🎃', '👻', '👽', '👾', '🎭', '🎪', '🎨'];
+            const botAvatar = botAvatars[Math.floor(Math.random() * botAvatars.length)];
+            
+            try {
+                await fetch(`${API_BASE}/api/join`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomCode: currentRoom, playerName: botName, deviceId: 'bot_' + Date.now(), avatar: botAvatar })
+                });
+                pollRoom();
+                showToast(`已添加 ${botName}`);
+            } catch (e) {
+                showToast('添加失败');
+            }
         }
     </script>
 </body>
