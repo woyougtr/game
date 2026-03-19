@@ -231,7 +231,7 @@
         }
         .give-all-item {
             display: flex; align-items: center; justify-content: space-between;
-            background: var(--bg); padding: 12px 14px; border-radius: 8px;
+            background: var(--bg); padding: 8px 12px; border-radius: 6px;
             gap: 10px;
         }
         .give-all-item .player-name { 
@@ -571,6 +571,7 @@
             grid.innerHTML = AVATARS.map(avatar => `
                 <div class="avatar-option ${avatar === selectedAvatar ? 'selected' : ''}" onclick="selectAvatar('${avatar}')">${avatar}</div>
             `).join('');
+            document.body.style.overflow = 'hidden';
             document.getElementById('avatarModal').classList.add('active');
         }
 
@@ -583,6 +584,7 @@
 
         function closeAvatarModal() {
             document.getElementById('avatarModal').classList.remove('active');
+            document.body.style.overflow = '';
         }
 
         async function confirmAvatar() {
@@ -669,11 +671,13 @@
             targetPlayer = playerName;
             document.getElementById('scoreModalTitle').textContent = `给 ${playerName} 多少分`;
             document.getElementById('scoreInput').value = '';
+            document.body.style.overflow = 'hidden';
             document.getElementById('scoreModal').classList.add('active');
         }
 
         function closeScoreModal() {
             document.getElementById('scoreModal').classList.remove('active');
+            document.body.style.overflow = '';
         }
 
         async function submitCustomScore() {
@@ -697,11 +701,13 @@
                     </div>
                 `;
             }).join('');
+            document.body.style.overflow = 'hidden';
             document.getElementById('giveAllModal').classList.add('active');
         }
 
         function closeGiveAllModal() {
             document.getElementById('giveAllModal').classList.remove('active');
+            document.body.style.overflow = '';
         }
 
         async function submitGiveAll() {
