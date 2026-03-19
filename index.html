@@ -414,6 +414,10 @@
         const roomFromUrl = urlParams.get('room');
         if (roomFromUrl) {
             document.getElementById('roomCode').value = roomFromUrl;
+            // 扫码进入后自动聚焦到名字输入框并弹出键盘
+            setTimeout(() => {
+                document.getElementById('playerName').focus();
+            }, 300);
         }
         
         let currentRoom = localStorage.getItem('roomCode') || '';
@@ -514,6 +518,8 @@
             const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
             document.getElementById('roomCode').value = roomCode;
             showToast(`房间号: ${roomCode}`);
+            // 创建房间后自动聚焦到名字输入框并弹出键盘
+            document.getElementById('playerName').focus();
         }
 
         function copyRoomCode() {
