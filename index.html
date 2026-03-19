@@ -393,11 +393,11 @@
 
     <!-- 一键给分弹窗 -->
     <div id="giveAllModal" class="modal-overlay">
-        <div class="modal" style="max-width:90vw;max-height:70vh">
+        <div class="modal" style="max-width:90vw;max-height:70vh;display:flex;flex-direction:column">
             <h3>一键给所有人分</h3>
             <p style="text-align:center;color:#94a3b8;margin-bottom:16px">填写每人获得的分数，确定后统一结算</p>
-            <div id="giveAllList" class="give-all-list"></div>
-            <div class="modal-btns" style="margin-top:16px">
+            <div id="giveAllList" class="give-all-list" style="flex:1;overflow-y:auto"></div>
+            <div class="modal-btns" style="margin-top:16px;flex-shrink:0">
                 <button class="btn btn-danger" onclick="closeGiveAllModal()">取消</button>
                 <button class="btn btn-success" onclick="submitGiveAll()">统一结算</button>
             </div>
