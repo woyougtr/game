@@ -7,24 +7,24 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --primary: #10b981;
-            --primary-light: #34d399;
+            --primary: #0ea5e9;
+            --primary-light: #38bdf8;
             --success: #22c55e;
             --danger: #ef4444;
             --warning: #f59e0b;
-            --bg: #f0fdf4;
+            --bg: #f0f9ff;
             --card-bg: #ffffff;
             --text: #1f2937;
-            --text-secondary: #6b7280;
-            --border: #e5e7eb;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
             background: var(--bg);
             background-image: 
-                radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+                radial-gradient(circle at 20% 20%, rgba(14, 165, 233, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(56, 189, 248, 0.08) 0%, transparent 50%);
             color: var(--text);
             padding-bottom: 100px;
         }
@@ -39,7 +39,7 @@
             letter-spacing: -0.5px;
         }
         h1 span {
-            background: linear-gradient(135deg, #10b981, #3b82f6);
+            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -65,7 +65,7 @@
             transition: transform 0.1s, background 0.2s;
         }
         .btn:active { transform: scale(0.98); }
-        .btn:hover { background: #059669; }
+        .btn:hover { background: #0284c7; }
         .btn-secondary { background: var(--border); color: var(--text); }
         .btn-secondary:hover { background: #d1d5db; }
         .btn-danger { background: var(--danger); }
@@ -94,7 +94,7 @@
         }
         .room-code { font-size: 14px; color: var(--text); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; font-weight: 500; }
         .room-code strong { color: var(--primary); font-size: 20px; letter-spacing: 2px; font-weight: 700; }
-        .share-btn { background: rgba(16, 185, 129, 0.1); border: 1px solid var(--primary); color: var(--primary); cursor: pointer; font-size: 12px; padding: 4px 10px; border-radius: 16px; transition: all 0.2s; font-weight: 500; }
+        .share-btn { background: rgba(14, 165, 233, 0.1); border: 1px solid var(--primary); color: var(--primary); cursor: pointer; font-size: 12px; padding: 4px 10px; border-radius: 16px; transition: all 0.2s; font-weight: 500; }
         .share-btn:hover { background: var(--primary); color: #fff; }
         .player-badge {
             display: inline-block; margin-top: 8px; padding: 6px 14px;
@@ -142,7 +142,7 @@
         .player-right { display: flex; align-items: center; gap: 12px; }
         .player-score { 
             font-size: 28px; font-weight: bold; min-width: 60px; text-align: right;
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -152,7 +152,7 @@
         .player-info { display: flex; align-items: center; gap: 10px; }
         .player-avatar {
             width: 44px; height: 44px; border-radius: 12px;
-            background: linear-gradient(135deg, #10b981, #3b82f6);
+            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
             display: flex; align-items: center; justify-content: center;
             font-size: 18px; font-weight: bold;
             color: #fff;
@@ -167,7 +167,7 @@
         }
         .btn-give {
             padding: 8px 16px; border: none; border-radius: 8px;
-            background: linear-gradient(135deg, var(--success), #10b981);
+            background: linear-gradient(135deg, var(--primary), #06b6d4);
             color: #fff; font-weight: 600; cursor: pointer; transition: transform 0.1s;
             white-space: nowrap;
         }
@@ -186,7 +186,7 @@
         .history-from { color: #f87171; font-weight: 600; }
         .history-to { color: var(--success); font-weight: 600; }
         .history-score { 
-            margin-left: auto; background: rgba(16, 185, 129, 0.1); padding: 4px 12px;
+            margin-left: auto; background: rgba(14, 165, 233, 0.1); padding: 4px 12px;
             border-radius: 8px; font-weight: 600; color: var(--primary);
         }
         .history-empty {
@@ -209,7 +209,7 @@
         .settlement-to { color: var(--success); font-weight: bold; font-size: 20px; }
         .settlement-amount {
             text-align: center; font-size: 32px; font-weight: bold;
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -235,7 +235,7 @@
         }
         .action-bar-top .btn {
             width: 100%;
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
         }
         
         .give-all-list {
@@ -346,7 +346,7 @@
         <!-- 游戏页面 -->
         <div id="gameScreen" class="screen">
             <div class="room-header">
-                <div class="room-code" style="justify-content:center;margin-bottom:12px">房间号 <strong id="displayRoomCode"></strong> <button onclick="copyRoomCode()" class="share-btn">复制</button> <button onclick="showShareQR()" class="share-btn" style="background:rgba(59,130,246,0.1);border-color:#3b82f6;color:#3b82f6">分享</button> <button onclick="addBotPlayer()" class="share-btn" style="background:rgba(16,185,129,0.1);border-color:#10b981;color:#10b981">+机器人</button></div>
+                <div class="room-code" style="justify-content:center;margin-bottom:12px">房间号 <strong id="displayRoomCode"></strong> <button onclick="copyRoomCode()" class="share-btn">复制</button> <button onclick="showShareQR()" class="share-btn" style="background:rgba(59,130,246,0.1);border-color:#3b82f6;color:#3b82f6">分享</button> <button onclick="addBotPlayer()" class="share-btn" style="background:rgba(14,165,233,0.1);border-color:#0ea5e9;color:#0ea5e9">+机器人</button></div>
                 <div style="display:flex;justify-content:center;align-items:center;gap:8px">
                     <span id="displayAvatar" style="font-size:24px;cursor:pointer" onclick="showAvatarModal()"></span>
                     <span id="displayPlayerName" style="color:var(--text);font-weight:600;font-size:16px"></span>
