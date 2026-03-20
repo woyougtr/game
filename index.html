@@ -348,7 +348,7 @@
         <!-- 游戏页面 -->
         <div id="gameScreen" class="screen">
             <div class="room-header">
-                <div class="room-code" style="justify-content:center;margin-bottom:12px">房间号 <strong id="displayRoomCode"></strong> <button onclick="copyRoomCode()" class="share-btn">复制</button> <button onclick="showShareQR()" class="share-btn" style="background:rgba(59,130,246,0.1);border-color:#3b82f6;color:#3b82f6">分享</button> <button onclick="addBotPlayer()" class="share-btn" style="background:rgba(14,165,233,0.1);border-color:#0ea5e9;color:#0ea5e9">+机器人</button></div>
+                <div class="room-code" style="justify-content:center;margin-bottom:12px">房间号 <strong id="displayRoomCode"></strong> <button onclick="copyRoomCode()" class="share-btn">复制</button> <button onclick="showShareQR()" class="share-btn" style="background:rgba(59,130,246,0.1);border-color:#3b82f6;color:#3b82f6">分享</button> </div>
                 <div style="display:flex;justify-content:center;align-items:center;gap:8px">
                     <span id="displayAvatar" style="font-size:24px;cursor:pointer" onclick="showAvatarModal()"></span>
                     <span id="displayPlayerName" style="color:var(--text);font-weight:600;font-size:16px"></span>
@@ -834,25 +834,6 @@
             setTimeout(() => t.classList.remove('show'), 3000);
         }
 
-        // 添加机器人玩家（测试用）
-        async function addBotPlayer() {
-            if (!currentRoom) return;
-            const playerCount = Object.keys(players).length + 1;
-            const botName = `玩家${playerCount}`;
-            const botAvatars = ['🤖', '🎃', '👻', '👽', '👾', '🎭', '🎪', '🎨'];
-            const botAvatar = botAvatars[Math.floor(Math.random() * botAvatars.length)];
-            
-            try {
-                await fetch(`${API_BASE}/api/join`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ roomCode: currentRoom, playerName: botName, deviceId: 'bot_' + Date.now(), avatar: botAvatar })
-                });
-                pollRoom();
-                showToast(`已添加 ${botName}`);
-            } catch (e) {
-                showToast('添加失败');
-            }
-        }
     </script>
 </body>
 </html>
